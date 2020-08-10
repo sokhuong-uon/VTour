@@ -17,4 +17,12 @@ $ npm run start
 $ npm run generate
 ```
 
-For detailed explanation on how things work, check out [Nuxt.js docs](https://nuxtjs.org).
+# Tools
+
+[Nuxt.js](https://nuxtjs.org)
+
+[Three.js](https://threejs.org)
+
+[Tailwind css](https://tailwindcss.com/)
+
+[GSAP](https://greensock.com/gsap/)
