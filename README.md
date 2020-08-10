@@ -17,6 +17,21 @@ $ npm run start
 $ npm run generate
 ```
 
+# Things to check
+ When the server up and running, you can check:
+
+  [http://localhost:3000/tours/classroom](http://localhost:3000/tours/classroom)
+
+  [http://localhost:3000/tours/castle](http://localhost:3000/tours/castle)
+
+  [http://localhost:3000/tours/swamplocation](http://localhost:3000/tours/swamplocation)
+
+  [http://localhost:3000/tours/gym](http://localhost:3000/tours/gym)
+
+  [http://localhost:3000/tours/office_building](http://localhost:3000/tours/office_building)
+
+  [http://localhost:3000/tours/office_interior](http://localhost:3000/tours/office_interior)
+
 # Tools
 
 [Nuxt.js](https://nuxtjs.org)
