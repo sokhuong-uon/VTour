@@ -13,8 +13,9 @@
 
 <script>
 import * as THREE from 'three';
+import gsap from 'gsap';
+import Stats from '../../node_modules/three/examples/jsm/libs/stats.module.js';
 import {GLTFLoader} from '../../node_modules/three/examples/jsm/loaders/GLTFLoader.js';
-import {OrbitControls} from '../../node_modules/three/examples/jsm/controls/OrbitControls.js';
 import {DRACOLoader} from '../../node_modules/three/examples/jsm/loaders/DRACOLoader.js';
 
 export default {
@@ -26,24 +27,43 @@ export default {
 			renderer: null,
 			controls: null,
 			mesh: null,
+
+			mouse: null,
+			mouseDown: null,
+			raycaster: null,
+			isShifDown: false,
+			stats: null,
+
+			rollOverMesh: null,
+			rollOverGeo: null,
+			rollOverMaterial: null,
+
+			outLineMesh1: null,
+			outLineMaterial1: null,
+
+
+			plane: null,
+			// objects for intersection
+			// objects: [],
+			intersects: null
 		}
+	},
+	computed: {
+
 	},
 	methods: {
 		init: function() {
-			// console.log("Dirname: ",__dirname);
 			const sceneSpace = document.getElementById('sceneSpace');
 
 			this.camera = new THREE.PerspectiveCamera(75, sceneSpace.clientWidth / sceneSpace.clientHeight, 0.1, 1000);
-			this.camera.position.set(0,0,100);
-			// console.log(this.camera);
-			this.camera.rotation.y = -Math.PI;
-			// this.camera.lookAt(0,-250,-250);
+			this.camera.position.set(0,10,10);
+			this.camera.rotateX(10);
+			this.camera.lookAt(0,0,0);
 
 			this.scene = new THREE.Scene();
 
-			const ambient = new THREE.AmbientLight(0x777777, 2);
+			const ambient = new THREE.AmbientLight(0x555555, 2);
     		this.scene.add(ambient);
-			// console.log(this);
 
 
 
@@ -57,9 +77,11 @@ export default {
 
 				// called when the resource is loaded
 				( gltf )=> {
-					console.log(gltf);
+					// console.log(gltf);
 					this.scene.add(gltf.scene);
-					this.mesh = gltf.scene.children[0]
+					this.mesh = gltf.scene.children[0];
+					// this.plane = gltf.scene.children[0];
+					// this.objects.push(this.plane);
 					// this.mesh.position.y += 140;
 					// this.mesh.rotation.z = -Math.PI;
 					// console.log(this.mesh);
@@ -83,6 +105,49 @@ export default {
 			);
 
 
+			// roll-over circle
+
+			let rollOverGeo = new THREE.CircleBufferGeometry(
+				// radius: float
+				1,
+				// segments: integer
+				50,
+				// thetaStart: float,
+				// thetaLength: float
+			);
+			let rollOverMaterial = new THREE.LineBasicMaterial({
+				color: 0xffffff,
+				opacity: .6,
+				transparent: true
+			});
+
+			this.rollOverMesh = new THREE.Mesh(
+				// geometry
+				rollOverGeo,
+				// material
+				rollOverMaterial
+			);
+			this.rollOverMesh.rotateX(-Math.PI / 2);
+
+			this.scene.add(this.rollOverMesh);
+
+			let outLineMaterial1 = new THREE.LineBasicMaterial({
+				color: 0xffffff,
+				opacity: .5,
+				side: THREE.DoubleSide
+			});
+
+			this.outLineMesh1 = new THREE.Mesh(rollOverGeo, outLineMaterial1);
+			this.outLineMesh1.position = this.rollOverMesh.position;
+			this.outLineMesh1.scale.multiplyScalar(.7);
+			this.rollOverMesh.add(this.outLineMesh1);
+
+			// raycaster
+
+			this.raycaster = new THREE.Raycaster();
+			this.mouse = new THREE.Vector2();
+
+
 
 			this.renderer = new THREE.WebGLRenderer({antialias: true});
 			this.renderer.outputEncoding = THREE.sRGBEncoding;
@@ -93,28 +158,146 @@ export default {
 
 			sceneSpace.appendChild(this.renderer.domElement);
 
-			this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-			this.controls.target.set(0,0,0);
-			this.controls.update();
+
+			this.stats = new Stats();
+			sceneSpace.appendChild( this.stats.domElement );
+
+			this.initControls();
+
+			this.renderer.setAnimationLoop(() => {
+				this.renderer.render(this.scene, this.camera);
+				// console.log(renderer.info.render.calls);
+				this.stats.update();
+			});
+
+
 
 		},
 
 		animate: function() {
 			requestAnimationFrame(this.animate);
 			this.renderer.render(this.scene, this.camera);
+			this.stats.update();
 		},
 
-		onWindowResize(){
+		onWindowResize: function(){
 			this.renderer.setSize(sceneSpace.clientWidth, sceneSpace.clientHeight);
 			this.camera.aspect = sceneSpace.clientWidth / sceneSpace.clientHeight;
 			this.camera.updateProjectionMatrix();
+		},
+
+		initControls: function() {
+			this.camera.rotation.order = "YXZ";
+
+			// mouse down event
+			document.addEventListener("mousedown", (evt)=>{
+				this.mouseDown = true;
+				document.getElementsByTagName("body")[0].style.cursor = "grab";
+			});
+
+			// mouse up event
+			document.addEventListener("mouseup", (evt)=>{
+				document.getElementsByTagName("body")[0].style.cursor = "default";
+				this.mouseDown = false;
+			});
+
+			document.addEventListener(
+				"mousemove",
+				(evt)=>{
+					let movementX = evt.movementX || evt.mozMovementX || evt.webkitMovementX || 0;
+					let movementY = evt.movementY || evt.mozMovementY || evt.webkitMovementY || 0;
+
+					if (this.mouseDown) {
+						document.getElementsByTagName("body")[0].style.cursor = "grabbing";
+						// gsap.to(camera.rotation, {y: -movementX / 400, x: -movementY / 400, easing: Power2.easIn});
+
+						this.camera.rotation.y -= -movementX / 600;
+						this.camera.rotation.x -= -movementY / 600;
+					}
+				},
+				false
+			);
+		},
+
+		// on mouse move
+
+		onDocumentMouseMove: function(event){
+			event.preventDefault();
+			let objects=[];
+			objects.push(this.mesh.children[0].children[0].children[53]);
+			// console.log(objects[0].children[0].children[0].children[53]);
+			this.mouse.set(
+				// X (this is the way we get x position)
+				(event.clientX / window.innerWidth) * 2 - 1,
+				// Y (this is the way we get y position)
+				-(event.clientY / window.innerHeight) * 2 + 1
+			);
+
+			this.raycaster.setFromCamera(this.mouse, this.camera);
+
+			// ray will intersect with objects added to array named objects
+			// let intersects = raycaster.intersectObjects(objects);
+			this.intersects = this.raycaster.intersectObjects(objects);
+			// console.log("Objects: ",objects[0].children[0]);
+			console.log("Intersects", this.intersects);
+			/*
+			the picking ray will intersects with one or more of all objects in the scene
+			let intersects = raycaster.intersectObjects(scene.children);
+			*/
+
+			if(this.intersects.length > 0){
+				let intersect = this.intersects[0];
+
+				console.log(intersect.point);
+				this.rollOverMesh.position.copy(intersect.point).add(intersect.face.normal);
+			}
+
+		},
+
+		// mouse down
+		onDocumentMouseDown: function(event){
+			event.preventDefault();
+			let objects=[];
+			objects.push(this.mesh.children[0].children[0].children[53]);
+			this.mouse.set(
+				// X (this is the way we get x position)
+				(event.clientX / window.innerWidth) * 2 - 1,
+				// Y (this is the way we get y position)
+				-(event.clientY / window.innerHeight) * 2 + 1
+			);
+
+			this.raycaster.setFromCamera(this.mouse, this.camera);
+
+			this.intersects = this.raycaster.intersectObjects(objects);
+
+			if(this.intersects.length > 0){
+				let intersect = this.intersects[0];
+
+				// here is the magic 🤩🤩
+				// Move camera 🎉🎉🎉🎉🎉🎉🎉
+				gsap.to(this.camera.position, 2, {
+					x: intersect.point.x,
+					z: intersect.point.z,
+					ease: "Power1.easeInOut",
+					onUpdate: () => {
+						this.camera.updateProjectionMatrix();
+					},
+					onComplete: () =>{
+						console.log('animatin ends');
+					}
+				});
+
+			}
 		}
 
 	},
 
 	mounted() {
 		this.init();
-		this.animate();
+		// this.initControls();
+		// this.animate();
+		document.addEventListener("mousemove", this.onDocumentMouseMove, false);
+    	document.addEventListener("mousedown", this.onDocumentMouseDown, false);
 		window.addEventListener('resize', () => {this.onWindowResize()}, false);
 	},
 
@@ -122,6 +305,7 @@ export default {
 	}
 }
 </script>
+
 <style lang="css">
 *{
 	margin: 0;
