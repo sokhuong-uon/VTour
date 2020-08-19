@@ -66,7 +66,6 @@ export default {
     		this.scene.add(ambient);
 
 
-
 			// Instantiate a loader
 			const loader = new GLTFLoader();
 
@@ -90,23 +89,16 @@ export default {
 
 				// called while loading is progressing
 				function ( xhr ) {
-
 					console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-
 				},
 
 				// called when loading has errors
 				function ( error ) {
-
 					console.log( 'An error happened' );
-					// console.log(error);
-
 				}
 			);
 
-
 			// roll-over circle
-
 			let rollOverGeo = new THREE.CircleBufferGeometry(
 				// radius: float
 				1,
@@ -143,11 +135,8 @@ export default {
 			this.rollOverMesh.add(this.outLineMesh1);
 
 			// raycaster
-
 			this.raycaster = new THREE.Raycaster();
 			this.mouse = new THREE.Vector2();
-
-
 
 			this.renderer = new THREE.WebGLRenderer({antialias: true});
 			this.renderer.outputEncoding = THREE.sRGBEncoding;
@@ -158,7 +147,6 @@ export default {
 
 			sceneSpace.appendChild(this.renderer.domElement);
 
-
 			this.stats = new Stats();
 			sceneSpace.appendChild( this.stats.domElement );
 
@@ -166,12 +154,8 @@ export default {
 
 			this.renderer.setAnimationLoop(() => {
 				this.renderer.render(this.scene, this.camera);
-				// console.log(renderer.info.render.calls);
 				this.stats.update();
 			});
-
-
-
 		},
 
 		animate: function() {
@@ -209,7 +193,6 @@ export default {
 
 					if (this.mouseDown) {
 						document.getElementsByTagName("body")[0].style.cursor = "grabbing";
-						// gsap.to(camera.rotation, {y: -movementX / 400, x: -movementY / 400, easing: Power2.easIn});
 
 						this.camera.rotation.y -= -movementX / 600;
 						this.camera.rotation.x -= -movementY / 600;
@@ -220,12 +203,10 @@ export default {
 		},
 
 		// on mouse move
-
 		onDocumentMouseMove: function(event){
 			event.preventDefault();
 			let objects=[];
 			objects.push(this.mesh.children[0].children[0].children[53]);
-			// console.log(objects[0].children[0].children[0].children[53]);
 			this.mouse.set(
 				// X (this is the way we get x position)
 				(event.clientX / window.innerWidth) * 2 - 1,
@@ -260,9 +241,7 @@ export default {
 			let objects=[];
 			objects.push(this.mesh.children[0].children[0].children[53]);
 			this.mouse.set(
-				// X (this is the way we get x position)
 				(event.clientX / window.innerWidth) * 2 - 1,
-				// Y (this is the way we get y position)
 				-(event.clientY / window.innerHeight) * 2 + 1
 			);
 
@@ -294,8 +273,6 @@ export default {
 
 	mounted() {
 		this.init();
-		// this.initControls();
-		// this.animate();
 		document.addEventListener("mousemove", this.onDocumentMouseMove, false);
     	document.addEventListener("mousedown", this.onDocumentMouseDown, false);
 		window.addEventListener('resize', () => {this.onWindowResize()}, false);
