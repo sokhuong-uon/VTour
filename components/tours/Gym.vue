@@ -13,9 +13,9 @@
 
 <script>
 import * as THREE from 'three';
+import gsap from 'gsap';
+import Stats from '../../node_modules/three/examples/jsm/libs/stats.module.js';
 import {GLTFLoader} from '../../node_modules/three/examples/jsm/loaders/GLTFLoader.js';
-import {OrbitControls} from '../../node_modules/three/examples/jsm/controls/OrbitControls.js';
-import {DRACOLoader} from '../../node_modules/three/examples/jsm/loaders/DRACOLoader.js';
 
 export default {
 	name: 'Gym',
@@ -26,28 +26,31 @@ export default {
 			renderer: null,
 			controls: null,
 			mesh: null,
+
+			mouse: null,
+			mouseDown: null,
+			raycaster: null,
+			isShifDown: false,
+			stats: null,
+
+			objects: [],
+			intersects: null
 		}
 	},
 	methods: {
 		init: function() {
-			// console.log("Dirname: ",__dirname);
 			const sceneSpace = document.getElementById('sceneSpace');
-
-			this.camera = new THREE.PerspectiveCamera(75, sceneSpace.clientWidth / sceneSpace.clientHeight, 0.1, 40000);
-			this.camera.position.set(0,0,200);
-			// console.log(this.camera);
-			// this.camera.rotation.y = -Math.PI;
-			// this.camera.lookAt(0,-250,-250);
-
 			this.scene = new THREE.Scene();
+			this.camera = new THREE.PerspectiveCamera(75, sceneSpace.clientWidth / sceneSpace.clientHeight, 0.1, 70000);
+			this.camera.position.set(0,0,500);
+			this.camera.lookAt(0,0,0);
+			// this.camera.rotateX(Math.PI / 2);
+			this.camera.rotateY(-Math.PI / 2);
+			// this.camera.rotateZ(Math.PI / 2);
 
 			const ambient = new THREE.AmbientLight(0x777777, 2);
     		this.scene.add(ambient);
-			// console.log(this);
 
-
-
-			// Instantiate a loader
 			const loader = new GLTFLoader();
 
 			// Load a glTF resource
@@ -57,65 +60,133 @@ export default {
 
 				// called when the resource is loaded
 				( gltf )=> {
-					// console.log(gltf);
 					this.scene.add(gltf.scene);
-					this.mesh = gltf.scene.children[0]
-					this.mesh.position.y -= 50;
-					this.mesh.scale.set(0.5, 0.5, 0.5);
-					// this.mesh.rotation.z = -Math.PI;
-					// console.log(this.mesh);
+					this.mesh = gltf.scene.children[0];
+					// this.mesh.scale.set(.1, .1, .1);
+					this.mesh.position.y -= 1000;
+					this.mesh.position.z += 5500;
+					console.log(this.mesh.children[0].children[0].children[0].children[16]);
 
 				},
 
 				// called while loading is progressing
 				function ( xhr ) {
-
 					console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-
 				},
 
 				// called when loading has errors
 				function ( error ) {
-
 					console.log( 'An error happened' );
-					// console.log(error);
-
 				}
 			);
 
 
+			// raycaster
+			this.raycaster = new THREE.Raycaster();
+			this.mouse = new THREE.Vector2();
 
 			this.renderer = new THREE.WebGLRenderer({antialias: true});
-			this.renderer.outputEncoding = THREE.sRGBEncoding;
-			this.renderer.setSize(sceneSpace.clientWidth, sceneSpace.clientHeight);
-			this.renderer.shadowMap.enabled = true;
-			this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 			this.renderer.setPixelRatio(sceneSpace.devicePixelRatio);
-
+			this.renderer.setSize(sceneSpace.clientWidth, sceneSpace.clientHeight);
+			// this.renderer.outputEncoding = THREE.sRGBEncoding;
+			this.renderer.shadowMap.enabled = true;
+			// this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 			sceneSpace.appendChild(this.renderer.domElement);
 
-			this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-			this.controls.target.set(0,0,0);
-			this.controls.update();
+			this.stats = new Stats();
+			sceneSpace.appendChild( this.stats.domElement );
+
+			this.initControls();
+
+			this.renderer.setAnimationLoop(() => {
+				this.renderer.render(this.scene, this.camera);
+				this.stats.update();
+			});
 
 		},
 
 		animate: function() {
 			requestAnimationFrame(this.animate);
 			this.renderer.render(this.scene, this.camera);
+			this.stats.update();
 		},
 
-		onWindowResize(){
+		onWindowResize: function(){
 			this.renderer.setSize(sceneSpace.clientWidth, sceneSpace.clientHeight);
 			this.camera.aspect = sceneSpace.clientWidth / sceneSpace.clientHeight;
 			this.camera.updateProjectionMatrix();
+		},
+
+		initControls: function() {
+			this.camera.rotation.order = "YXZ";
+
+			// mouse down event
+			document.addEventListener("mousedown", (evt)=>{
+				this.mouseDown = true;
+				document.getElementsByTagName("body")[0].style.cursor = "grab";
+			});
+
+			// mouse up event
+			document.addEventListener("mouseup", (evt)=>{
+				document.getElementsByTagName("body")[0].style.cursor = "default";
+				this.mouseDown = false;
+			});
+
+			document.addEventListener(
+				"mousemove",
+				(evt)=>{
+					let movementX = evt.movementX || evt.mozMovementX || evt.webkitMovementX || 0;
+					let movementY = evt.movementY || evt.mozMovementY || evt.webkitMovementY || 0;
+
+					if (this.mouseDown) {
+						document.getElementsByTagName("body")[0].style.cursor = "grabbing";
+						this.camera.rotation.y -= -movementX / 600;
+						this.camera.rotation.x -= -movementY / 600;
+					}
+				},
+				false
+			);
+		},
+
+
+		// mouse down
+		onDocumentMouseDown: function(event){
+			event.preventDefault();
+			this.objects = [];
+			this.objects.push(this.mesh.children[0].children[0].children[0].children[16]);
+			this.mouse.set(
+				(event.clientX / this.renderer.domElement.clientWidth) * 2 - 1,
+				-(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1
+			);
+
+			this.raycaster.setFromCamera(this.mouse, this.camera);
+			this.intersects = this.raycaster.intersectObjects(this.objects);
+
+			if(this.intersects.length > 0){
+				let intersect = this.intersects[0];
+
+				// here is the magic 🤩🤩
+				// Move camera 🎉🎉🎉🎉🎉🎉🎉
+				gsap.to(this.camera.position, 2, {
+					x: intersect.point.x,
+					z: intersect.point.z,
+					ease: "Power1.easeInOut",
+					onUpdate: () => {
+						this.camera.updateProjectionMatrix();
+					},
+					onComplete: () =>{
+						console.log('animatin ends');
+					}
+				});
+
+			}
 		}
 
 	},
 
 	mounted() {
 		this.init();
-		this.animate();
+    	document.addEventListener("mousedown", this.onDocumentMouseDown, false);
 		window.addEventListener('resize', () => {this.onWindowResize()}, false);
 	},
 
@@ -123,9 +194,3 @@ export default {
 	}
 }
 </script>
-<style lang="css">
-*{
-	margin: 0;
-	padding: 0;
-}
-</style>
