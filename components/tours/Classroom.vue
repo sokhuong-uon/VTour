@@ -75,7 +75,6 @@ export default {
 				( gltf )=> {
 					this.scene.add(gltf.scene);
 					this.mesh = gltf.scene.children[0].children[0].children[0];
-					console.log(this.mesh);
 				},
 
 				// called while loading is progressing
