@@ -33,14 +33,6 @@ export default {
 			isShifDown: false,
 			stats: null,
 
-			circleRoller: null,
-			circleRollerGeo: null,
-			circleRollerMaterial: null,
-
-			outLineMaterial: null,
-			outLine: null,
-
-			plane: null,
 			objects: [],
 			intersects: null
 		}
