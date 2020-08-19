@@ -34,17 +34,15 @@ export default {
 			isShifDown: false,
 			stats: null,
 
-			rollOverMesh: null,
-			rollOverGeo: null,
-			rollOverMaterial: null,
+			circleRoller: null,
+			circleRollerGeo: null,
+			circleRollerMaterial: null,
 
-			outLineMesh1: null,
-			outLineMaterial1: null,
-
+			outLineMaterial: null,
+			outLine: null,
 
 			plane: null,
-			// objects for intersection
-			// objects: [],
+			objects: [],
 			intersects: null
 		}
 	},
@@ -65,7 +63,6 @@ export default {
 			const ambient = new THREE.AmbientLight(0x555555, 2);
     		this.scene.add(ambient);
 
-
 			// Instantiate a loader
 			const loader = new GLTFLoader();
 
@@ -76,15 +73,9 @@ export default {
 
 				// called when the resource is loaded
 				( gltf )=> {
-					// console.log(gltf);
 					this.scene.add(gltf.scene);
-					this.mesh = gltf.scene.children[0];
-					// this.plane = gltf.scene.children[0];
-					// this.objects.push(this.plane);
-					// this.mesh.position.y += 140;
-					// this.mesh.rotation.z = -Math.PI;
-					// console.log(this.mesh);
-
+					this.mesh = gltf.scene.children[0].children[0].children[0];
+					console.log(this.mesh);
 				},
 
 				// called while loading is progressing
@@ -98,53 +89,47 @@ export default {
 				}
 			);
 
-			// roll-over circle
-			let rollOverGeo = new THREE.CircleBufferGeometry(
-				// radius: float
-				1,
-				// segments: integer
-				50,
-				// thetaStart: float,
-				// thetaLength: float
-			);
-			let rollOverMaterial = new THREE.LineBasicMaterial({
-				color: 0xffffff,
-				opacity: .6,
-				transparent: true
-			});
+			// circle roller
+			// let circleRollerGeo = new THREE.CircleBufferGeometry(
+			// 	// radius: float
+			// 	1,
+			// 	// segments: integer
+			// 	360,
+			// 	// thetaStart: float,
+			// 	// thetaLength: float
+			// );
+			// let circleRollerMaterial = new THREE.LineBasicMaterial({
+			// 	color: 0xffffff,
+			// 	opacity: 1,
+			// 	transparent: false
+			// });
 
-			this.rollOverMesh = new THREE.Mesh(
-				// geometry
-				rollOverGeo,
-				// material
-				rollOverMaterial
-			);
-			this.rollOverMesh.rotateX(-Math.PI / 2);
+			// this.circleRoller = new THREE.Mesh(circleRollerGeo, circleRollerMaterial);
+			// this.circleRoller.rotateX(Math.PI / 2);
 
-			this.scene.add(this.rollOverMesh);
+			// this.scene.add(this.circleRoller);
 
-			let outLineMaterial1 = new THREE.LineBasicMaterial({
-				color: 0xffffff,
-				opacity: .5,
-				side: THREE.DoubleSide
-			});
+			// let outLineMaterial = new THREE.MeshBasicMaterial({
+			// 	color: 0xffffff,
+			// 	opacity: .8,
+			// 	side: THREE.DoubleSide
+			// });
 
-			this.outLineMesh1 = new THREE.Mesh(rollOverGeo, outLineMaterial1);
-			this.outLineMesh1.position = this.rollOverMesh.position;
-			this.outLineMesh1.scale.multiplyScalar(.7);
-			this.rollOverMesh.add(this.outLineMesh1);
+			// this.outLine = new THREE.Mesh(circleRollerGeo, outLineMaterial);
+			// this.outLine.position = this.circleRoller.position;
+			// this.outLine.scale.multiplyScalar(.7);
+			// this.circleRoller.add(this.outLine);
 
 			// raycaster
 			this.raycaster = new THREE.Raycaster();
 			this.mouse = new THREE.Vector2();
 
 			this.renderer = new THREE.WebGLRenderer({antialias: true});
-			this.renderer.outputEncoding = THREE.sRGBEncoding;
+			this.renderer.setPixelRatio(sceneSpace.devicePixelRatio);
 			this.renderer.setSize(sceneSpace.clientWidth, sceneSpace.clientHeight);
+			this.renderer.outputEncoding = THREE.sRGBEncoding;
 			this.renderer.shadowMap.enabled = true;
 			this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-			this.renderer.setPixelRatio(sceneSpace.devicePixelRatio);
-
 			sceneSpace.appendChild(this.renderer.domElement);
 
 			this.stats = new Stats();
@@ -193,7 +178,6 @@ export default {
 
 					if (this.mouseDown) {
 						document.getElementsByTagName("body")[0].style.cursor = "grabbing";
-
 						this.camera.rotation.y -= -movementX / 600;
 						this.camera.rotation.x -= -movementY / 600;
 					}
@@ -203,51 +187,43 @@ export default {
 		},
 
 		// on mouse move
-		onDocumentMouseMove: function(event){
+		onDocumentMouseMove: function (event){
 			event.preventDefault();
-			let objects=[];
-			objects.push(this.mesh.children[0].children[0].children[53]);
+			console.log('log of this:'+ this);
+			this.objects = [];
+			this.objects.push(this.mesh.children[53]);
 			this.mouse.set(
-				// X (this is the way we get x position)
 				(event.clientX / window.innerWidth) * 2 - 1,
-				// Y (this is the way we get y position)
 				-(event.clientY / window.innerHeight) * 2 + 1
 			);
 
 			this.raycaster.setFromCamera(this.mouse, this.camera);
 
 			// ray will intersect with objects added to array named objects
-			// let intersects = raycaster.intersectObjects(objects);
-			this.intersects = this.raycaster.intersectObjects(objects);
-			// console.log("Objects: ",objects[0].children[0]);
-			console.log("Intersects", this.intersects);
+			this.intersects = this.raycaster.intersectObjects(this.objects);
+
 			/*
 			the picking ray will intersects with one or more of all objects in the scene
 			let intersects = raycaster.intersectObjects(scene.children);
 			*/
-
 			if(this.intersects.length > 0){
 				let intersect = this.intersects[0];
-
-				console.log(intersect.point);
-				this.rollOverMesh.position.copy(intersect.point).add(intersect.face.normal);
+				// this.circleRoller.position.copy(intersect.point).add(intersect.face.normal);
 			}
-
 		},
 
 		// mouse down
 		onDocumentMouseDown: function(event){
 			event.preventDefault();
-			let objects=[];
-			objects.push(this.mesh.children[0].children[0].children[53]);
+			this.objects = [];
+			this.objects.push(this.mesh.children[53]);
 			this.mouse.set(
 				(event.clientX / window.innerWidth) * 2 - 1,
 				-(event.clientY / window.innerHeight) * 2 + 1
 			);
 
 			this.raycaster.setFromCamera(this.mouse, this.camera);
-
-			this.intersects = this.raycaster.intersectObjects(objects);
+			this.intersects = this.raycaster.intersectObjects(this.objects);
 
 			if(this.intersects.length > 0){
 				let intersect = this.intersects[0];
@@ -282,10 +258,3 @@ export default {
 	}
 }
 </script>
-
-<style lang="css">
-*{
-	margin: 0;
-	padding: 0;
-}
-</style>
