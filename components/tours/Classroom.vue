@@ -189,7 +189,6 @@ export default {
 		// on mouse move
 		onDocumentMouseMove: function (event){
 			event.preventDefault();
-			console.log('log of this:'+ this);
 			this.objects = [];
 			this.objects.push(this.mesh.children[53]);
 			this.mouse.set(
