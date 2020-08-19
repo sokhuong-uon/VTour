@@ -16,7 +16,6 @@ import * as THREE from 'three';
 import gsap from 'gsap';
 import Stats from '../../node_modules/three/examples/jsm/libs/stats.module.js';
 import {GLTFLoader} from '../../node_modules/three/examples/jsm/loaders/GLTFLoader.js';
-import {DRACOLoader} from '../../node_modules/three/examples/jsm/loaders/DRACOLoader.js';
 
 export default {
 	name: 'Classroom',
@@ -88,37 +87,6 @@ export default {
 				}
 			);
 
-			// circle roller
-			// let circleRollerGeo = new THREE.CircleBufferGeometry(
-			// 	// radius: float
-			// 	1,
-			// 	// segments: integer
-			// 	360,
-			// 	// thetaStart: float,
-			// 	// thetaLength: float
-			// );
-			// let circleRollerMaterial = new THREE.LineBasicMaterial({
-			// 	color: 0xffffff,
-			// 	opacity: 1,
-			// 	transparent: false
-			// });
-
-			// this.circleRoller = new THREE.Mesh(circleRollerGeo, circleRollerMaterial);
-			// this.circleRoller.rotateX(Math.PI / 2);
-
-			// this.scene.add(this.circleRoller);
-
-			// let outLineMaterial = new THREE.MeshBasicMaterial({
-			// 	color: 0xffffff,
-			// 	opacity: .8,
-			// 	side: THREE.DoubleSide
-			// });
-
-			// this.outLine = new THREE.Mesh(circleRollerGeo, outLineMaterial);
-			// this.outLine.position = this.circleRoller.position;
-			// this.outLine.scale.multiplyScalar(.7);
-			// this.circleRoller.add(this.outLine);
-
 			// raycaster
 			this.raycaster = new THREE.Raycaster();
 			this.mouse = new THREE.Vector2();
@@ -185,30 +153,6 @@ export default {
 			);
 		},
 
-		// on mouse move
-		onDocumentMouseMove: function (event){
-			event.preventDefault();
-			this.objects = [];
-			this.objects.push(this.mesh.children[53]);
-			this.mouse.set(
-				(event.clientX / this.renderer.domElement.clientWidth) * 2 - 1,
-				-(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1
-			);
-
-			this.raycaster.setFromCamera(this.mouse, this.camera);
-
-			// ray will intersect with objects added to array named objects
-			this.intersects = this.raycaster.intersectObjects(this.objects);
-
-			/*
-			the picking ray will intersects with one or more of all objects in the scene
-			let intersects = raycaster.intersectObjects(scene.children);
-			*/
-			if(this.intersects.length > 0){
-				let intersect = this.intersects[0];
-				// this.circleRoller.position.copy(intersect.point).add(intersect.face.normal);
-			}
-		},
 
 		// mouse down
 		onDocumentMouseDown: function(event){
@@ -247,7 +191,6 @@ export default {
 
 	mounted() {
 		this.init();
-		document.addEventListener("mousemove", this.onDocumentMouseMove, false);
     	document.addEventListener("mousedown", this.onDocumentMouseDown, false);
 		window.addEventListener('resize', () => {this.onWindowResize()}, false);
 	},
