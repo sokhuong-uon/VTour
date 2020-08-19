@@ -191,8 +191,8 @@ export default {
 			this.objects = [];
 			this.objects.push(this.mesh.children[53]);
 			this.mouse.set(
-				(event.clientX / window.innerWidth) * 2 - 1,
-				-(event.clientY / window.innerHeight) * 2 + 1
+				(event.clientX / this.renderer.domElement.clientWidth) * 2 - 1,
+				-(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1
 			);
 
 			this.raycaster.setFromCamera(this.mouse, this.camera);
@@ -216,8 +216,8 @@ export default {
 			this.objects = [];
 			this.objects.push(this.mesh.children[53]);
 			this.mouse.set(
-				(event.clientX / window.innerWidth) * 2 - 1,
-				-(event.clientY / window.innerHeight) * 2 + 1
+				(event.clientX / this.renderer.domElement.clientWidth) * 2 - 1,
+				-(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1
 			);
 
 			this.raycaster.setFromCamera(this.mouse, this.camera);
