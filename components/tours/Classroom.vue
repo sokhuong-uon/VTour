@@ -101,7 +101,7 @@ export default {
             this.circleRollerMaterial = new THREE.LineBasicMaterial({
                 color: 0xffffff,
                 opacity: .8,
-                transparent: true
+                transparent: false
             });
 
             this.circleRoller = new THREE.Mesh(this.circleRollerGeo, this.circleRollerMaterial);
@@ -111,7 +111,7 @@ export default {
 
             this.outLineMaterial = new THREE.MeshBasicMaterial({
                 color: 0xffffff,
-                opacity: .8,
+                opacity: 1,
                 side: THREE.DoubleSide
             });
 
@@ -195,8 +195,8 @@ export default {
             // this.objects = [];
             // this.objects.push(this.mesh.children[53]);
             this.mouse.set(
-                (event.clientX / this.renderer.domElement.innerWidth) * 2 - 1,
-                -(event.clientY / this.renderer.domElement.innerHeight) * 2 + 1
+                (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1,
+                -(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1
             );
 
             this.raycaster.setFromCamera(this.mouse, this.camera);
@@ -209,9 +209,15 @@ export default {
             the picking ray will intersects with one or more of all objects in the scene
             let intersects = raycaster.intersectObjects(scene.children);
             */
+
             if (this.intersects.length > 0) {
                 let intersect = this.intersects[0];
-                this.circleRoller.position.copy(intersect.point).add(intersect.face.normal);
+                // console.log(intersect);
+                // this.circleRoller.position.set(0,0,0);
+                if (intersect.object.id == 72){
+                    // this.circleRoller.position.copy(intersect.point).add(intersect.face.normal);
+                    this.circleRoller.position = intersect.point
+                }
             }
         },
 
@@ -231,7 +237,7 @@ export default {
 
             if (this.intersects.length > 0) {
                 let intersect = this.intersects[0];
-                console.log(intersect);
+                // console.log(intersect);
 
                 // here is the magic 🤩🤩
                 // Move camera 🎉🎉🎉🎉🎉🎉🎉
@@ -255,7 +261,7 @@ export default {
 
     mounted() {
         this.init();
-        console.log(this.scene.children);
+        // console.log(this.scene.children);
         document.addEventListener("mousemove", this.onDocumentMouseMove, false);
         document.addEventListener("mousedown", this.onDocumentMouseDown, false);
         window.addEventListener('resize', () => {
