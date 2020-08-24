@@ -30,24 +30,15 @@ export default {
 	},
 	methods: {
 		init: function() {
-			// console.log("Dirname: ",__dirname);
 			const sceneSpace = document.getElementById('sceneSpace');
-
 			this.camera = new THREE.PerspectiveCamera(75, sceneSpace.clientWidth / sceneSpace.clientHeight, 0.1, 1000);
 			this.camera.position.set(0,0,100);
-			// console.log(this.camera);
-			this.camera.rotation.y = -Math.PI;
-			// this.camera.lookAt(0,-250,-250);
 
 			this.scene = new THREE.Scene();
 
 			const ambient = new THREE.AmbientLight(0xD9D9D9, 2);
     		this.scene.add(ambient);
-			// console.log(this);
 
-
-
-			// Instantiate a loader
 			const loader = new GLTFLoader();
 
 			// Load a glTF resource
@@ -57,39 +48,32 @@ export default {
 
 				// called when the resource is loaded
 				( gltf )=> {
-					// console.log(gltf);
 					this.scene.add(gltf.scene);
 					this.mesh = gltf.scene.children[0]
 					this.mesh.position.y += 140;
-					this.mesh.rotation.z = -Math.PI;
-					// console.log(this.mesh);
-
+					this.mesh.rotateY(-Math.PI);
+					console.log(this.mesh);
 				},
 
 				// called while loading is progressing
 				function ( xhr ) {
-
 					console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-
 				},
 
 				// called when loading has errors
 				function ( error ) {
-
 					console.log( 'An error happened' );
-					// console.log(error);
-
 				}
 			);
 
 
 
 			this.renderer = new THREE.WebGLRenderer({antialias: true});
-			this.renderer.outputEncoding = THREE.sRGBEncoding;
 			this.renderer.setSize(sceneSpace.clientWidth, sceneSpace.clientHeight);
+			this.renderer.setPixelRatio(sceneSpace.devicePixelRatio);
+			this.renderer.outputEncoding = THREE.sRGBEncoding;
 			this.renderer.shadowMap.enabled = true;
 			this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-			this.renderer.setPixelRatio(sceneSpace.devicePixelRatio);
 
 			sceneSpace.appendChild(this.renderer.domElement);
 
@@ -122,9 +106,3 @@ export default {
 	}
 }
 </script>
-<style lang="css" scoped>
-*{
-	margin: 0;
-	padding: 0;
-}
-</style>

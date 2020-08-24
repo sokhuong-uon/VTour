@@ -33,6 +33,13 @@ export default {
 			isShifDown: false,
 			stats: null,
 
+			circleRoller: null,
+			circleRollerGeo: null,
+			circleRollerMaterial: null,
+
+			outLineMaterial: null,
+			outLine: null,
+
 			objects: [],
 			intersects: null
 		}
@@ -41,9 +48,9 @@ export default {
 		init: function() {
 			const sceneSpace = document.getElementById('sceneSpace');
 			this.scene = new THREE.Scene();
-			this.camera = new THREE.PerspectiveCamera(75, sceneSpace.clientWidth / sceneSpace.clientHeight, 0.1, 70000);
+			this.camera = new THREE.PerspectiveCamera(75, sceneSpace.clientWidth / sceneSpace.clientHeight, 0.1, 100000);
 			this.camera.position.set(0,0,500);
-			this.camera.lookAt(0,0,0);
+			// this.camera.lookAt(0,0,0);
 			// this.camera.rotateX(Math.PI / 2);
 			this.camera.rotateY(-Math.PI / 2);
 			// this.camera.rotateZ(Math.PI / 2);
@@ -81,6 +88,37 @@ export default {
 			);
 
 
+			// circle roller
+			this.circleRollerGeo = new THREE.CircleBufferGeometry(
+				// radius: float
+				1,
+				// segments: integer
+				100,
+				// thetaStart: float,
+				// thetaLength: float
+			);
+			this.circleRollerMaterial = new THREE.LineBasicMaterial({
+				color: 0xffffff,
+				opacity: .8,
+				transparent: true
+			});
+
+			this.circleRoller = new THREE.Mesh(this.circleRollerGeo, this.circleRollerMaterial);
+			this.circleRoller.rotateX(Math.PI / 2);
+
+			this.scene.add(this.circleRoller);
+
+			this.outLineMaterial = new THREE.MeshBasicMaterial({
+				color: 0xffffff,
+				opacity: .8,
+				side: THREE.DoubleSide
+			});
+
+			this.outLine = new THREE.Mesh(this.circleRollerGeo, this.outLineMaterial);
+			this.outLine.position = this.circleRoller.position;
+			this.outLine.scale.multiplyScalar(.7);
+			this.circleRoller.add(this.outLine);
+
 			// raycaster
 			this.raycaster = new THREE.Raycaster();
 			this.mouse = new THREE.Vector2();
@@ -88,9 +126,8 @@ export default {
 			this.renderer = new THREE.WebGLRenderer({antialias: true});
 			this.renderer.setPixelRatio(sceneSpace.devicePixelRatio);
 			this.renderer.setSize(sceneSpace.clientWidth, sceneSpace.clientHeight);
-			// this.renderer.outputEncoding = THREE.sRGBEncoding;
 			this.renderer.shadowMap.enabled = true;
-			// this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+			this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 			sceneSpace.appendChild(this.renderer.domElement);
 
 			this.stats = new Stats();
@@ -146,6 +183,32 @@ export default {
 				},
 				false
 			);
+		},
+
+		// on mouse move
+		onDocumentMouseMove: function (event){
+			event.preventDefault();
+			// console.log('log of this:'+ this);
+			this.objects = [];
+			this.objects.push(this.mesh.children[53]);
+			this.mouse.set(
+				(event.clientX / this.renderer.domElement.innerWidth) * 2 - 1,
+				-(event.clientY / this.renderer.domElement.innerHeight) * 2 + 1
+			);
+
+			this.raycaster.setFromCamera(this.mouse, this.camera);
+
+			// ray will intersect with objects added to array named objects
+			this.intersects = this.raycaster.intersectObjects(this.objects);
+
+			/*
+			the picking ray will intersects with one or more of all objects in the scene
+			let intersects = raycaster.intersectObjects(scene.children);
+			*/
+			if(this.intersects.length > 0){
+				let intersect = this.intersects[0];
+				this.circleRoller.position.copy(intersect.point).add(intersect.face.normal);
+			}
 		},
 
 
