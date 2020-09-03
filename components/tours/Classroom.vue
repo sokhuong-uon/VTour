@@ -43,7 +43,10 @@ export default {
 
             objects: [],
             intersects: null,
-            group: null
+            group: null,
+
+			delta: 1000 / 60,
+			timeTarget: 0
         }
     },
     computed: {
@@ -139,16 +142,27 @@ export default {
 
             this.initControls();
 
-            this.renderer.setAnimationLoop(() => {
-                this.renderer.render(this.scene, this.camera);
-                this.stats.update();
-            });
+            // this.renderer.setAnimationLoop(() => {
+            //     this.renderer.render(this.scene, this.camera);
+            //     this.stats.update();
+            // });
+			this.animate();
         },
 
         animate: function () {
-            requestAnimationFrame(this.animate);
-            this.renderer.render(this.scene, this.camera);
-            this.stats.update();
+			setTimeout(
+                () => {
+                    requestAnimationFrame( this.animate );
+                    this.renderer.render(this.scene, this.camera);
+                    this.stats.update();
+			    },
+                // to set the time out.
+                // 1000 / 30 // 30 fps
+                1000 / 60   // 60 fps
+            );
+			// requestAnimationFrame( this.animate );
+			// this.renderer.render(this.scene, this.camera);
+			// this.stats.update();
         },
 
         onWindowResize: function () {
