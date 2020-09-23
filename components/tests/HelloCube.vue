@@ -50,6 +50,7 @@ export default {
 
 			// create scene
 			this.scene = new Scene();
+			this.scene.name  = "Scene";
 
 			// create directional light
 			this.light = new DirectionalLight(0xb5edf5, 1);
@@ -62,7 +63,7 @@ export default {
 			this.renderer = new WebGLRenderer({antialias: true});
 			this.renderer.setSize(this.sceneSpace.clientWidth, this.sceneSpace.clientHeight);
 			this.renderer.setPixelRatio(this.sceneSpace.devicePixelRatio);
-			this.renderer.name = "renderer"
+			this.renderer.name = "Renderer";
 
 			//add renderer to the DOM
 			this.sceneSpace.appendChild(this.renderer.domElement);
