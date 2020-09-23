@@ -43,7 +43,7 @@ export default {
 		init() {
 			this.sceneSpace = document.getElementById('sceneSpace');
 
-			// camera
+			// Camera
 			{
 				const fov = 75;
 				const aspect = this.sceneSpace.clientWidth / this.sceneSpace.clientHeight;
@@ -53,13 +53,13 @@ export default {
 				this.camera.position.set(0,0,5);
 			}
 
-			// create scene
+			// Scene
 			{
 				this.scene = new Scene();
 				this.scene.name  = "Scene";
 			}
 
-			// directional light
+			// Directional light
 			{
 				this.light = new DirectionalLight(0xb5edf5, 1);
 				this.light.name = "directional light"
@@ -76,10 +76,10 @@ export default {
 				this.renderer.name = "Renderer";
 			}
 
-			//add renderer to the DOM
+			// Add renderer to the DOM
 			this.sceneSpace.appendChild(this.renderer.domElement);
 
-			// cube
+			// Cube
 			{
 				const boxWidth = 1;
 				const boxHeight = 1;
@@ -95,9 +95,9 @@ export default {
 				}
 			}
 
-			//raycaster
+			// Raycaster
 			this.raycaster = new Raycaster();
-			//mouse
+			// Mouse
 			this.mouse = new Vector2(); // x, y
 		},
 
@@ -114,15 +114,15 @@ export default {
 			this.raycaster.setFromCamera(this.mouse, this.camera);
 			const intersects = this.raycaster.intersectObjects(this.scene.children);
 
-			// what to do with object/s that intersect with the mouse
+			// What to do with object/s that intersect with the mouse
 			if(intersects.length){
-				// take all object
+				// Take all object
 				// intersects.forEach((intersectObj)=>{
 				// 	intersectObj.object.rotation.y += 0.05;
 				// 	intersectObj.object.rotation.z += 0.02;
 				// })
 
-				// take only the front object
+				// Take only the front object
 				intersects[0].object.rotation.y += 0.05;
 				intersects[0].object.rotation.z += 0.02;
 			}
