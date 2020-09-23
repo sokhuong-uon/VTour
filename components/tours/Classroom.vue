@@ -1,6 +1,6 @@
 <template>
 <div id="sceneSpace" class="w-screen h-screen">
-    <div class="flex justify-center absolute w-screen text-gray-500">
+    <div class="absolute flex justify-center w-screen text-gray-500">
         <div class="text-center">
             <h1>3D Model</h1>
             <p>Author: <a target="_blank" href="https://sketchfab.com/GlobalDigitalHeritage"><span class="text-indigo-500">Global Digital Heritage</span></a></p>
@@ -69,6 +69,7 @@ export default {
 
             // Instantiate a loader
             const loader = new GLTFLoader();
+
 
             // Load a glTF resource
             loader.load(
