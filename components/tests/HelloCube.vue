@@ -86,13 +86,13 @@ export default {
 				const boxDepth = 1;
 				const geometry = new BoxGeometry(boxWidth, boxHeight, boxDepth);
 				const material = new MeshPhongMaterial({color: 0x851141}); //Materila that reflect the light
-			}
 
-			for(let i=0; i<=5; i++){
-				const cube = new Mesh(geometry, material);
-				cube.position.set(_.random(-2, 1), _.random(-2, 2), _.random(-2, 2));
-				cube.name = `Cube ${i}`;
-				this.scene.add(cube);
+				for(let i=0; i<=5; i++){
+					const cube = new Mesh(geometry, material);
+					cube.position.set(_.random(-2, 1), _.random(-2, 2), _.random(-2, 2));
+					cube.name = `Cube ${i}`;
+					this.scene.add(cube);
+				}
 			}
 
 			// create raycaster
