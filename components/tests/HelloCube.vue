@@ -41,6 +41,7 @@ export default {
 	},
 	methods: {
 		init() {
+			// Container
 			this.sceneSpace = document.getElementById('sceneSpace');
 
 			// Camera
