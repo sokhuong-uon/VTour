@@ -18,11 +18,14 @@
 </template>
 
 <script>
+
 import {
 	Scene, WebGLRenderer, PerspectiveCamera, BoxGeometry,
-	Mesh, AxesHelper, Raycaster, Vector2, CubeTextureLoader, DirectionalLight, MeshPhongMaterial
+	Mesh, AxesHelper, Raycaster, Vector2, CubeTextureLoader,
+	DirectionalLight, MeshPhongMaterial
 } from 'three';
 import _ from 'lodash';
+
 export default {
 	name: 'HelloCube',
 	data() {
@@ -40,40 +43,50 @@ export default {
 		init() {
 			this.sceneSpace = document.getElementById('sceneSpace');
 
-			// camera setup
-			const fov = 75;
-			const aspect = this.sceneSpace.clientWidth / this.sceneSpace.clientHeight;
-			const near = 0.1;
-			const far = 1000;
-			this.camera = new PerspectiveCamera(fov, aspect, near, far);
-			this.camera.position.set(0,0,5);
+			// camera
+			{
+				const fov = 75;
+				const aspect = this.sceneSpace.clientWidth / this.sceneSpace.clientHeight;
+				const near = 0.1;
+				const far = 1000;
+				this.camera = new PerspectiveCamera(fov, aspect, near, far);
+				this.camera.position.set(0,0,5);
+			}
 
 			// create scene
-			this.scene = new Scene();
-			this.scene.name  = "Scene";
+			{
+				this.scene = new Scene();
+				this.scene.name  = "Scene";
+			}
 
-			// create directional light
-			this.light = new DirectionalLight(0xb5edf5, 1);
-			this.light.name = "directional light"
-			this.light.position.set(0, 0, 20);
-			this.light.lookAt(0,0,0);
-			this.scene.add(this.light);
+			// directional light
+			{
+				this.light = new DirectionalLight(0xb5edf5, 1);
+				this.light.name = "directional light"
+				this.light.position.set(0, 0, 20);
+				this.light.lookAt(0,0,0);
+				this.scene.add(this.light);
+			}
 
-			// create WebGL renderer
-			this.renderer = new WebGLRenderer({antialias: true});
-			this.renderer.setSize(this.sceneSpace.clientWidth, this.sceneSpace.clientHeight);
-			this.renderer.setPixelRatio(this.sceneSpace.devicePixelRatio);
-			this.renderer.name = "Renderer";
+			// WebGL renderer
+			{
+				this.renderer = new WebGLRenderer({antialias: true});
+				this.renderer.setSize(this.sceneSpace.clientWidth, this.sceneSpace.clientHeight);
+				this.renderer.setPixelRatio(this.sceneSpace.devicePixelRatio);
+				this.renderer.name = "Renderer";
+			}
 
 			//add renderer to the DOM
 			this.sceneSpace.appendChild(this.renderer.domElement);
 
-			// cube setup
-			const boxWidth = 1;
-			const boxHeight = 1;
-			const boxDepth = 1;
-			const geometry = new BoxGeometry(boxWidth, boxHeight, boxDepth);
-			const material = new MeshPhongMaterial({color: 0x851141}); //Materila that reflect the light
+			// cube gene
+			{
+				const boxWidth = 1;
+				const boxHeight = 1;
+				const boxDepth = 1;
+				const geometry = new BoxGeometry(boxWidth, boxHeight, boxDepth);
+				const material = new MeshPhongMaterial({color: 0x851141}); //Materila that reflect the light
+			}
 
 			for(let i=0; i<=5; i++){
 				const cube = new Mesh(geometry, material);
