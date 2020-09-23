@@ -1,6 +1,6 @@
 <template>
 <div id="sceneSpace" class="w-screen h-screen">
-    <div class="absolute flex justify-center w-screen text-gray-500">
+    <div class="absolute flex justify-center w-screen text-gray-500 select-none">
         <div class="text-center">
             <h1>3D Model</h1>
             <p>Author: <a target="_blank" href="https://sketchfab.com/GlobalDigitalHeritage"><span class="text-indigo-500">Global Digital Heritage</span></a></p>
@@ -11,17 +11,21 @@
 </template>
 
 <script>
-import * as THREE from 'three';
+
+import {
+	PerspectiveCamera, AmbientLight, Scene, WebGLRenderer, Mesh, Raycaster,
+	LineBasicMaterial, CircleBufferGeometry, MeshBasicMaterial, Vector2,
+	DoubleSide, sRGBEncoding, PCFSoftShadowMap, Group
+} from 'three';
 import gsap from 'gsap';
 import Stats from '../../node_modules/three/examples/jsm/libs/stats.module.js';
-import {
-    GLTFLoader
-} from '../../node_modules/three/examples/jsm/loaders/GLTFLoader.js';
+import {GLTFLoader} from '../../node_modules/three/examples/jsm/loaders/GLTFLoader.js';
 
 export default {
     name: 'Classroom',
     data() {
         return {
+			sceneSpace: null,
             camera: null,
             scene: null,
             renderer: null,
@@ -49,166 +53,150 @@ export default {
 			timeTarget: 0
         }
     },
-    computed: {
 
-    },
     methods: {
-        init: function () {
-            const sceneSpace = document.getElementById('sceneSpace');
+        init() {
+			// Container
+            this.sceneSpace = document.getElementById('sceneSpace');
 
-            this.camera = new THREE.PerspectiveCamera(75, sceneSpace.clientWidth / sceneSpace.clientHeight, 0.1, 1000);
-            this.camera.position.set(0, 10, 10);
+			// Camera
+			{
+				const fov = 75;
+				const aspect = this.sceneSpace.clientWidth / this.sceneSpace.clientHeight;
+				const near = 0.1;
+				const far = 1000;
+				this.camera = new PerspectiveCamera(fov, aspect, near, far);
+				this.camera.position.set(0,10,10);
+			}
 
-            this.scene = new THREE.Scene();
+			// Scene
+			{
+				this.scene = new Scene();
+				this.scene.name  = "Scene";
+			}
 
-            this.group = new THREE.Group();
-            this.scene.add(this.group);
+			// WebGL Renderer
+			{
+				this.renderer = new WebGLRenderer({antialias: true});
+				this.renderer.setPixelRatio(this.sceneSpace.devicePixelRatio);
+				this.renderer.setSize(this.sceneSpace.clientWidth, this.sceneSpace.clientHeight);
+				this.renderer.outputEncoding = sRGBEncoding;
+				this.renderer.shadowMap.enabled = true;
+				this.renderer.shadowMap.type = PCFSoftShadowMap;
+				this.sceneSpace.appendChild(this.renderer.domElement);
 
-            const ambient = new THREE.AmbientLight(0x555555, 2);
-            this.scene.add(ambient);
+				this.stats = new Stats();
+				this.sceneSpace.appendChild(this.stats.domElement);
+			}
 
-            // Instantiate a loader
-            const loader = new GLTFLoader();
+			// Group
+			{
+				this.group = new Group();
+				this.scene.add(this.group);
+			}
 
+			// Light
+			{
+				const ambientLight = new AmbientLight(0x555555, 2);
+				this.scene.add(ambientLight);
+			}
 
-            // Load a glTF resource
-            loader.load(
-                // resource URL
-                '../../gltf/lowpoly_stylized_classroom/scene.gltf',
+            // Load GLTF
+			{
+				const loader = new GLTFLoader();
 
-                // called when the resource is loaded
-                (gltf) => {
-                    this.scene.add(gltf.scene);
-                    this.mesh = gltf.scene.children[0].children[0].children[0];
-                },
+				loader.load(
+					'../../gltf/lowpoly_stylized_classroom/scene.gltf',
 
-                // called while loading is progressing
-                function (xhr) {
-                    console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-                },
+					// called when the resource is loaded
+					(gltf) => {
+						this.scene.add(gltf.scene);
+						this.mesh = gltf.scene.children[0].children[0].children[0];
+					},
 
-                // called when loading has errors
-                function (error) {
-                    console.log('An error happened');
-                }
-            );
+					// called while loading is progressing
+					function (xhr) {
+						console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+					},
 
-            // circle roller
-            this.circleRollerGeo = new THREE.CircleBufferGeometry(
-                // radius: float
-                1,
-                // segments: integer
-                100,
-                // thetaStart: float,
-                // thetaLength: float
-            );
-            this.circleRollerMaterial = new THREE.LineBasicMaterial({
-                color: 0xffffff,
-                opacity: .8,
-                transparent: false
-            });
+					// called when loading has errors
+					function (error) {
+						console.log('An error happened');
+					}
+				);
+			}
 
-            this.circleRoller = new THREE.Mesh(this.circleRollerGeo, this.circleRollerMaterial);
-            this.circleRoller.rotateX(Math.PI / 2);
+            // Circle roller
+			{
+				this.circleRollerGeo = new CircleBufferGeometry(1, 100,);
+				this.circleRollerMaterial = new LineBasicMaterial({
+					color: 0xffffff,
+					opacity: .8,
+					transparent: false
+				});
 
-            this.scene.add(this.circleRoller);
+				this.circleRoller = new Mesh(this.circleRollerGeo, this.circleRollerMaterial);
+				this.circleRoller.rotateX(Math.PI / 2);
 
-            this.outLineMaterial = new THREE.MeshBasicMaterial({
-                color: 0xffffff,
-                opacity: 1,
-                side: THREE.DoubleSide
-            });
+				this.scene.add(this.circleRoller);
 
-            this.outLine = new THREE.Mesh(this.circleRollerGeo, this.outLineMaterial);
-            this.outLine.position = this.circleRoller.position;
-            this.outLine.scale.multiplyScalar(.7);
-            this.circleRoller.add(this.outLine);
+				this.outLineMaterial = new MeshBasicMaterial({
+					color: 0xffffff,
+					opacity: 1,
+					side: DoubleSide
+				});
 
-            // raycaster
-            this.raycaster = new THREE.Raycaster();
-            this.mouse = new THREE.Vector2();
+				this.outLine = new Mesh(this.circleRollerGeo, this.outLineMaterial);
+				this.outLine.position = this.circleRoller.position;
+				this.outLine.scale.multiplyScalar(.7);
+				this.circleRoller.add(this.outLine);
+			}
 
-            this.renderer = new THREE.WebGLRenderer({
-                antialias: true
-            });
-            this.renderer.setPixelRatio(sceneSpace.devicePixelRatio);
-            this.renderer.setSize(sceneSpace.clientWidth, sceneSpace.clientHeight);
-            this.renderer.outputEncoding = THREE.sRGBEncoding;
-            this.renderer.shadowMap.enabled = true;
-            this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            sceneSpace.appendChild(this.renderer.domElement);
+            // Raycaster
+            this.raycaster = new Raycaster();
 
-            this.stats = new Stats();
-            sceneSpace.appendChild(this.stats.domElement);
+			// Mouse
+            this.mouse = new Vector2();
 
-            this.initControls();
-
-            // this.renderer.setAnimationLoop(() => {
-            //     this.renderer.render(this.scene, this.camera);
-            //     this.stats.update();
-            // });
-			this.animate();
         },
 
-        animate: function () {
-			setTimeout(
-                () => {
-                    requestAnimationFrame( this.animate );
-                    this.renderer.render(this.scene, this.camera);
-                    this.stats.update();
-			    },
-                // to set the time out.
-                // 1000 / 30 // 30 fps
-                1000 / 60   // 60 fps
-            );
-			// requestAnimationFrame( this.animate );
-			// this.renderer.render(this.scene, this.camera);
-			// this.stats.update();
+        animate() {
+			setTimeout( () => {
+				requestAnimationFrame( this.animate );
+				this.renderer.render(this.scene, this.camera);
+				this.stats.update();
+			}, 1000 / 60);	// 60 fps, 1000/30 for 30 fps
         },
 
-        onWindowResize: function () {
-            this.renderer.setSize(sceneSpace.clientWidth, sceneSpace.clientHeight);
-            this.camera.aspect = sceneSpace.clientWidth / sceneSpace.clientHeight;
-            this.camera.updateProjectionMatrix();
-        },
-
-        initControls: function () {
+        initControls() {
             this.camera.rotation.order = "YXZ";
 
             // mouse down event
             document.addEventListener("mousedown", (evt) => {
                 this.mouseDown = true;
-                document.getElementsByTagName("body")[0].style.cursor = "grab";
+                this.sceneSpace.style.cursor = "grab";
             });
 
             // mouse up event
             document.addEventListener("mouseup", (evt) => {
-                document.getElementsByTagName("body")[0].style.cursor = "default";
+                this.sceneSpace.style.cursor = "default";
                 this.mouseDown = false;
             });
 
-            document.addEventListener(
-                "mousemove",
-                (evt) => {
-                    let movementX = evt.movementX || evt.mozMovementX || evt.webkitMovementX || 0;
-                    let movementY = evt.movementY || evt.mozMovementY || evt.webkitMovementY || 0;
+            document.addEventListener("mousemove", (evt) => {
+				let movementX = evt.movementX || evt.mozMovementX || evt.webkitMovementX || 0;
+				let movementY = evt.movementY || evt.mozMovementY || evt.webkitMovementY || 0;
 
-                    if (this.mouseDown) {
-                        document.getElementsByTagName("body")[0].style.cursor = "grabbing";
-                        this.camera.rotation.y -= -movementX / 600;
-                        this.camera.rotation.x -= -movementY / 600;
-                    }
-                },
-                false
-            );
+				if (this.mouseDown) {
+					this.sceneSpace.style.cursor = "grabbing";
+					this.camera.rotation.y -= -movementX / 600;
+					this.camera.rotation.x -= -movementY / 600;
+				}
+            },false);
         },
 
-        // on mouse move
-        onDocumentMouseMove: function (event) {
-            event.preventDefault();
-            // console.log('log of this:'+ this);
-            // this.objects = [];
-            // this.objects.push(this.mesh.children[53]);
+        onDocumentMouseMove(event) {
+
             this.mouse.set(
                 (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1,
                 -(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1
@@ -225,10 +213,10 @@ export default {
             let intersects = raycaster.intersectObjects(scene.children);
             */
 
-            if (this.intersects.length > 0) {
+            if (this.intersects.length) {
+
                 let intersect = this.intersects[0];
-                // console.log(intersect);
-                // this.circleRoller.position.set(0,0,0);
+
                 if (intersect.object.id == 72){
                     // this.circleRoller.position.copy(intersect.point).add(intersect.face.normal);
                     this.circleRoller.position = intersect.point
@@ -237,10 +225,7 @@ export default {
         },
 
         // mouse down
-        onDocumentMouseDown: function (event) {
-            event.preventDefault();
-            // this.objects = [];
-            // this.objects.push(this.mesh.children[53]);
+        onDocumentMouseDown(event) {
             this.mouse.set(
                 (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1,
                 -(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1
@@ -250,13 +235,14 @@ export default {
             // this.intersects = this.raycaster.intersectObjects(this.objects);
             this.intersects = this.raycaster.intersectObjects(this.scene.children[3].children[0].children[0].children[0].children);
 
-            if (this.intersects.length > 0) {
+            if (this.intersects.length) {
+
                 let intersect = this.intersects[0];
-                // console.log(intersect);
 
                 // here is the magic 🤩🤩
                 // Move camera 🎉🎉🎉🎉🎉🎉🎉
-                if (intersect.object.id == 72)
+                if (intersect.object.id == 72){
+
                     gsap.to(this.camera.position, 2, {
                         x: intersect.point.x,
                         z: intersect.point.z,
@@ -265,23 +251,31 @@ export default {
                             this.camera.updateProjectionMatrix();
                         },
                         onComplete: () => {
-                            console.log('animatin ends');
+                            console.log('animation ends');
                         }
                     });
+				}
 
             }
-        }
+        },
 
+		onWindowResize() {
+            this.renderer.setSize(this.sceneSpace.clientWidth, this.sceneSpace.clientHeight);
+            this.camera.aspect = this.sceneSpace.clientWidth / this.sceneSpace.clientHeight;
+            this.camera.updateProjectionMatrix();
+        },
     },
 
     mounted() {
         this.init();
-        // console.log(this.scene.children);
+		this.initControls();
+		this.animate();
         document.addEventListener("mousemove", this.onDocumentMouseMove, false);
         document.addEventListener("mousedown", this.onDocumentMouseDown, false);
-        window.addEventListener('resize', () => {
-            this.onWindowResize()
-        }, false);
+        window.addEventListener('resize', this.onWindowResize, false);
+    },
+
+	computed: {
     },
 
     created() {}
