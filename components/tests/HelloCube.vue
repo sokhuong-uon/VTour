@@ -1,58 +1,116 @@
 <template>
 <div id="sceneSpace" class="w-screen h-screen">
-	<div class="absolute flex justify-center w-screen text-gray-500">
+	<div class="absolute flex flex-col items-center justify-center w-screen text-gray-500 select-none">
 		<div class="text-center">
 			<h1>Example</h1>
-			<p>Source: <a target="_blank" href="https://threejsfundamentals.org/threejs/lessons/threejs-fundamentals.html"><span class="text-indigo-500">Threejs Fundamentals</span></a></p>
+			<p>Reference:
+				<a target="_blank" href="https://threejs.org/">
+					<span class="text-indigo-500 hover:underline">Three.js</span>
+				</a>
+				<a target="_blank" href="https://threejsfundamentals.org/threejs/lessons/threejs-fundamentals.html">
+					<span class="text-indigo-500 hover:underline">Threejs Fundamentals</span>
+				</a>
+			</p>
 		</div>
+		<div class="text-green-600">Move your mouse over the Cubes 😊</div>
 	</div>
 </div>
 </template>
 
 <script>
-import * as THREE from 'three';
-
+import {
+	Scene, WebGLRenderer, PerspectiveCamera, BoxGeometry,
+	Mesh, AxesHelper, Raycaster, Vector2, CubeTextureLoader, DirectionalLight, MeshPhongMaterial
+} from 'three';
+import _ from 'lodash';
 export default {
 	name: 'HelloCube',
 	data() {
 		return {
+			sceneSpace: null,
 			camera: null,
 			scene: null,
 			renderer: null,
-			mesh: null,
+			light: null,
+			raycaster: null,
+			mouse: null,
 		}
 	},
 	methods: {
-		init: function() {
-			const sceneSpace = document.getElementById('sceneSpace');
-			this.camera = new THREE.PerspectiveCamera(75, sceneSpace.clientWidth / sceneSpace.clientHeight, 0.1, 1000);
+		init() {
+			this.sceneSpace = document.getElementById('sceneSpace');
+
+			// camera setup
+			const fov = 75;
+			const aspect = this.sceneSpace.clientWidth / this.sceneSpace.clientHeight;
+			const near = 0.1;
+			const far = 1000;
+			this.camera = new PerspectiveCamera(fov, aspect, near, far);
 			this.camera.position.set(0,0,5);
 
-			this.scene = new THREE.Scene();
+			// create scene
+			this.scene = new Scene();
 
-			const light = new THREE.AmbientLight();
-			// this.scene.add(light)
+			// create directional light
+			this.light = new DirectionalLight(0xb5edf5, 1);
+			this.light.name = "directional light"
+			this.light.position.set(0, 0, 20);
+			this.light.lookAt(0,0,0);
+			this.scene.add(this.light);
 
-			this.renderer = new THREE.WebGLRenderer({antialias: true});
-			this.renderer.setSize(sceneSpace.clientWidth, sceneSpace.clientHeight);
-			this.renderer.setPixelRatio(sceneSpace.devicePixelRatio);
+			// create WebGL renderer
+			this.renderer = new WebGLRenderer({antialias: true});
+			this.renderer.setSize(this.sceneSpace.clientWidth, this.sceneSpace.clientHeight);
+			this.renderer.setPixelRatio(this.sceneSpace.devicePixelRatio);
+			this.renderer.name = "renderer"
 
-			sceneSpace.appendChild(this.renderer.domElement);
+			//add renderer to the DOM
+			this.sceneSpace.appendChild(this.renderer.domElement);
 
+			// cube setup
 			const boxWidth = 1;
 			const boxHeight = 1;
 			const boxDepth = 1;
-			const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+			const geometry = new BoxGeometry(boxWidth, boxHeight, boxDepth);
+			const material = new MeshPhongMaterial({color: 0x851141}); //Materila that reflect the light
 
-			const material = new THREE.MeshBasicMaterial({color: 0x44aa88});  // greenish blue
+			for(let i=0; i<=5; i++){
+				const cube = new Mesh(geometry, material);
+				cube.position.set(_.random(-2, 1), _.random(-2, 2), _.random(-2, 2));
+				cube.name = `Cube ${i}`;
+				this.scene.add(cube);
+			}
 
-			const cube = new THREE.Mesh(geometry, material);
-			this.scene.add(cube);
+			// create raycaster
+			this.raycaster = new Raycaster();
+			this.mouse = new Vector2(); // x, y
 		},
 
-		animate: function() {
+		animate() {
 			requestAnimationFrame(this.animate);
 			this.renderer.render(this.scene, this.camera);
+		},
+		onMouseMove(event){
+			this.mouse.set(
+                (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1, 	// x
+                -(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1	// y
+            );
+
+			this.raycaster.setFromCamera(this.mouse, this.camera);
+			const intersects = this.raycaster.intersectObjects(this.scene.children);
+
+			// what to do with object/s that intersect with the mouse
+			if(intersects.length){
+				// take all object
+				// intersects.forEach((intersectObj)=>{
+				// 	intersectObj.object.rotation.y += 0.05;
+				// 	intersectObj.object.rotation.z += 0.02;
+				// })
+
+				// take only the front object
+				intersects[0].object.rotation.y += 0.05;
+				intersects[0].object.rotation.z += 0.02;
+			}
 		},
 
 		onWindowResize(){
@@ -60,13 +118,13 @@ export default {
 			this.camera.aspect = sceneSpace.clientWidth / sceneSpace.clientHeight;
 			this.camera.updateProjectionMatrix();
 		}
-
 	},
 
 	mounted() {
 		this.init();
 		this.animate();
 		window.addEventListener('resize', () => {this.onWindowResize()}, false);
+		window.addEventListener('mousemove', this.onMouseMove);
 	},
 
 	created(){
