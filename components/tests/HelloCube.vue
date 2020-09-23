@@ -79,7 +79,7 @@ export default {
 			//add renderer to the DOM
 			this.sceneSpace.appendChild(this.renderer.domElement);
 
-			// cube gene
+			// cube
 			{
 				const boxWidth = 1;
 				const boxHeight = 1;
@@ -95,8 +95,9 @@ export default {
 				}
 			}
 
-			// create raycaster
+			//raycaster
 			this.raycaster = new Raycaster();
+			//mouse
 			this.mouse = new Vector2(); // x, y
 		},
 
