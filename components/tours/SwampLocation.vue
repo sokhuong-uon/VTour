@@ -30,7 +30,7 @@ export default {
 	},
 	methods: {
 		init: function() {
-			// console.log("Dirname: ",__dirname);
+			console.log(CricleOver);
 			const sceneSpace = document.getElementById('sceneSpace');
 
 			this.camera = new THREE.PerspectiveCamera(75, sceneSpace.clientWidth / sceneSpace.clientHeight, 0.1, 1000);

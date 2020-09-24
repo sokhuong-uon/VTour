@@ -74,9 +74,9 @@ export default {
 			// WebGL renderer
 			{
 				this.renderer = new WebGLRenderer({antialias: true});
+				this.renderer.name = "Renderer";
 				this.renderer.setSize(this.sceneSpace.clientWidth, this.sceneSpace.clientHeight);
 				this.renderer.setPixelRatio(this.sceneSpace.devicePixelRatio);
-				this.renderer.name = "Renderer";
 			}
 
 			// Add renderer to the DOM
@@ -103,6 +103,8 @@ export default {
 
 			// Mouse
 			this.mouse = new Vector2(); // x, y
+
+			this.renderer.setAnimationLoop(this.animate);
 		},
 
 		animate() {

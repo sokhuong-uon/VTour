@@ -1,18 +1,24 @@
 <template>
-	<div id="sceneSpace" class="w-screen h-screen">
-		<div class="flex justify-center absolute w-screen text-gray-500">
-			<div class="text-center">
-				<h1>3D Model</h1>
-				<p>Author: <a target="_blank" href="https://sketchfab.com/y2dan"><span class="text-indigo-500">y2dan</span></a></p>
-				<p>Source: <a target="_blank" href="https://sketchfab.com/models/7ae0c1028c404669826cde0656829287"><span class="text-indigo-500">Avenue Tennis - Main Gym 2018</span></a></p>
+	<div class="relative w-screen h-screen flex items-center justify-center">
+		<div id="sceneSpace" class="w-screen h-screen">
+			<div class="flex justify-center absolute w-screen text-gray-500">
+				<div class="text-center">
+					<h1>3D Model</h1>
+					<p>Author: <a target="_blank" href="https://sketchfab.com/y2dan"><span class="text-indigo-500">y2dan</span></a></p>
+					<p>Source: <a target="_blank" href="https://sketchfab.com/models/7ae0c1028c404669826cde0656829287"><span class="text-indigo-500">Avenue Tennis - Main Gym 2018</span></a></p>
+				</div>
 			</div>
 		</div>
 	</div>
 </template>
 
-
 <script>
-import * as THREE from 'three';
+
+import {
+	PerspectiveCamera, AmbientLight, Scene, WebGLRenderer, Mesh, Raycaster,
+	LineBasicMaterial, CircleBufferGeometry, MeshBasicMaterial, Vector2,
+	DoubleSide, sRGBEncoding, PCFSoftShadowMap, Group
+} from 'three';
 import gsap from 'gsap';
 import Stats from '../../node_modules/three/examples/jsm/libs/stats.module.js';
 import {GLTFLoader} from '../../node_modules/three/examples/jsm/loaders/GLTFLoader.js';
@@ -21,236 +27,247 @@ export default {
 	name: 'Gym',
 	data() {
 		return {
-			camera: null,
-			scene: null,
-			renderer: null,
-			controls: null,
-			mesh: null,
+			sceneSpace: null,
+            renderer: null,
+            stats: null,
+            camera: null,
+            scene: null,
+            controls: null,
+            raycaster: null,
+            group: null,
+            mesh: null,
 
-			mouse: null,
-			mouseDown: null,
-			raycaster: null,
-			isShifDown: false,
-			stats: null,
+            mouse: null,
+            mouseDown: null,
 
-			circleRoller: null,
-			circleRollerGeo: null,
-			circleRollerMaterial: null,
+            circleOverHelper: null,
+            circleRollerGeo: null,
+            circleRollerMaterial: null,
 
-			outLineMaterial: null,
-			outLine: null,
+            outLineMaterial: null,
+            outLine: null,
 
-			objects: [],
-			intersects: null
+            intersects: null,
+			targetObjects: null
 		}
 	},
 	methods: {
-		init: function() {
-			const sceneSpace = document.getElementById('sceneSpace');
-			this.scene = new THREE.Scene();
-			this.camera = new THREE.PerspectiveCamera(75, sceneSpace.clientWidth / sceneSpace.clientHeight, 0.1, 100000);
-			this.camera.position.set(0,0,500);
-			// this.camera.lookAt(0,0,0);
-			// this.camera.rotateX(Math.PI / 2);
-			this.camera.rotateY(-Math.PI / 2);
-			// this.camera.rotateZ(Math.PI / 2);
+		init() {
+			// Container
+            this.sceneSpace = document.getElementById('sceneSpace');
 
-			const ambient = new THREE.AmbientLight(0x777777, 2);
-    		this.scene.add(ambient);
+			// Camera
+			{
+				const fov = 75;
+				const aspect = this.sceneSpace.clientWidth / this.sceneSpace.clientHeight;
+				const near = 0.1;
+				const far = 70000;
+				this.camera = new PerspectiveCamera(fov, aspect, near, far);
+				this.camera.position.set(0,0,500);
+				this.camera.rotateY(-Math.PI / 2);
+			}
 
-			const loader = new GLTFLoader();
+			// Scene
+			{
+				this.scene = new Scene();
+				this.scene.name  = "Scene";
+			}
 
-			// Load a glTF resource
-			loader.load(
-				// resource URL
-				'../../gltf/avenue_tennis_-_main_gym_2018/scene.gltf',
+			// WebGL Renderer
+			{
+				this.renderer = new WebGLRenderer({antialias: true});
+				this.renderer.name = "Renderer";
+				this.renderer.setPixelRatio(this.sceneSpace.devicePixelRatio);
+				this.renderer.setSize(this.sceneSpace.clientWidth, this.sceneSpace.clientHeight);
+				this.renderer.outputEncoding = sRGBEncoding;
+				this.renderer.shadowMap.enabled = true;
+				this.renderer.shadowMap.type = PCFSoftShadowMap;
+				this.sceneSpace.appendChild(this.renderer.domElement);
+			}
 
-				// called when the resource is loaded
-				( gltf )=> {
-					this.scene.add(gltf.scene);
-					this.mesh = gltf.scene.children[0];
-					// this.mesh.scale.set(.1, .1, .1);
-					this.mesh.position.y -= 1000;
-					this.mesh.position.z += 5500;
-					console.log(this.mesh.children[0].children[0].children[0].children[16]);
+			// Stats
+			{
+				this.stats = new Stats();
+				this.sceneSpace.appendChild(this.stats.domElement);
+			}
 
-				},
+			// Light
+			{
+				const color = 0x555555;
+				const intensity = 2;
+				const ambientLight = new AmbientLight(color, intensity);
+				this.scene.add(ambientLight);
+			}
 
-				// called while loading is progressing
-				function ( xhr ) {
-					console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-				},
+			// Load GLTF
+			{
+				const loader = new GLTFLoader();
 
-				// called when loading has errors
-				function ( error ) {
-					console.log( 'An error happened' );
-				}
-			);
+				loader.load(
+					'../../gltf/avenue_tennis_-_main_gym_2018/scene.gltf',
 
+					// Call when the resource is loaded
+					( gltf )=> {
+						this.scene.add(gltf.scene);
+						this.mesh = gltf.scene.children[0];
+						this.mesh.position.y -= 1000;
+						this.mesh.position.z += 5500;
+						// this.mesh.scale.set(0.1, 0.1, 0.1);
+						// console.log(this.mesh); //gltf scene
 
-			// circle roller
-			this.circleRollerGeo = new THREE.CircleBufferGeometry(
-				// radius: float
-				1,
-				// segments: integer
-				100,
-				// thetaStart: float,
-				// thetaLength: float
-			);
-			this.circleRollerMaterial = new THREE.LineBasicMaterial({
-				color: 0xffffff,
-				opacity: .8,
-				transparent: true
-			});
+						this.targetObjects = gltf.scene.children[0].children[0].children[0].children[0].children;
+						console.log(this.targetObjects);
+						// console.log(this.mesh.children[0].children[0]); // Gym
+						// console.log(this.mesh.children[0].children[0].children[0]); // Models
+						// console.log(this.mesh.children[0].children[0].children[0].children[15]); // red floor
+						// console.log(this.mesh.children[0].children[0].children[0].children[16]); // white floor
 
-			this.circleRoller = new THREE.Mesh(this.circleRollerGeo, this.circleRollerMaterial);
-			this.circleRoller.rotateX(Math.PI / 2);
+					},
 
-			this.scene.add(this.circleRoller);
+					// Call while loading is progressing
+					( xhr ) => {
+						console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+					},
 
-			this.outLineMaterial = new THREE.MeshBasicMaterial({
-				color: 0xffffff,
-				opacity: .8,
-				side: THREE.DoubleSide
-			});
+					// Call when loading has errors
+					( error ) => {
+						console.log( 'An error happened' );
+					}
+				);
+			}
 
-			this.outLine = new THREE.Mesh(this.circleRollerGeo, this.outLineMaterial);
-			this.outLine.position = this.circleRoller.position;
-			this.outLine.scale.multiplyScalar(.7);
-			this.circleRoller.add(this.outLine);
+			// Circle roller
+			{
+				this.circleRollerGeo = new CircleBufferGeometry(1, 100,);
+				this.circleRollerMaterial = new LineBasicMaterial({
+					color: 0xffffff,
+					opacity: .8,
+					transparent: false
+				});
 
-			// raycaster
-			this.raycaster = new THREE.Raycaster();
-			this.mouse = new THREE.Vector2();
+				this.circleOverHelper = new Mesh(this.circleRollerGeo, this.circleRollerMaterial);
+				this.circleOverHelper.rotateX(Math.PI / 2);
 
-			this.renderer = new THREE.WebGLRenderer({antialias: true});
-			this.renderer.setPixelRatio(sceneSpace.devicePixelRatio);
-			this.renderer.setSize(sceneSpace.clientWidth, sceneSpace.clientHeight);
-			this.renderer.shadowMap.enabled = true;
-			this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-			sceneSpace.appendChild(this.renderer.domElement);
+				this.scene.add(this.circleOverHelper);
 
-			this.stats = new Stats();
-			sceneSpace.appendChild( this.stats.domElement );
+				this.outLineMaterial = new MeshBasicMaterial({
+					color: 0xffffff,
+					opacity: 1,
+					side: DoubleSide
+				});
 
-			this.initControls();
+				this.outLine = new Mesh(this.circleRollerGeo, this.outLineMaterial);
+				this.outLine.position = this.circleOverHelper.position;
+				this.outLine.scale.multiplyScalar(.7);
+				this.circleOverHelper.add(this.outLine);
+			}
 
-			this.renderer.setAnimationLoop(() => {
+            // Raycaster
+            this.raycaster = new Raycaster();
+
+			// Mouse
+            this.mouse = new Vector2();
+
+			this.renderer.setAnimationLoop(this.animate);
+
+		},
+
+		animate() {
+			setTimeout( () => {
+				requestAnimationFrame( this.animate );
 				this.renderer.render(this.scene, this.camera);
 				this.stats.update();
-			});
+			}, 1000 / 60);	// 60 fps, 1000/30 for 30 fps
+        },
 
-		},
+		initControls() {
+            this.camera.rotation.order = "YXZ";
 
-		animate: function() {
-			requestAnimationFrame(this.animate);
-			this.renderer.render(this.scene, this.camera);
-			this.stats.update();
-		},
+            // Mouse down
+            this.sceneSpace.addEventListener("mousedown", (evt) => {
+                this.mouseDown = true;
+                this.sceneSpace.style.cursor = "grab";
+            }, false);
 
-		onWindowResize: function(){
-			this.renderer.setSize(sceneSpace.clientWidth, sceneSpace.clientHeight);
-			this.camera.aspect = sceneSpace.clientWidth / sceneSpace.clientHeight;
-			this.camera.updateProjectionMatrix();
-		},
+            // Mouse up
+            this.sceneSpace.addEventListener("mouseup", (evt) => {
+                this.sceneSpace.style.cursor = "default";
+                this.mouseDown = false;
+            }, false);
 
-		initControls: function() {
-			this.camera.rotation.order = "YXZ";
+            this.sceneSpace.addEventListener("mousemove", (evt) => {
+				let movementX = evt.movementX || evt.mozMovementX || evt.webkitMovementX || 0;
+				let movementY = evt.movementY || evt.mozMovementY || evt.webkitMovementY || 0;
 
-			// mouse down event
-			document.addEventListener("mousedown", (evt)=>{
-				this.mouseDown = true;
-				document.getElementsByTagName("body")[0].style.cursor = "grab";
-			});
+				if (this.mouseDown) {
+					this.sceneSpace.style.cursor = "grabbing";
+					this.camera.rotation.y -= -movementX / 600;
+					this.camera.rotation.x -= -movementY / 600;
+				}
+            },false);
+        },
 
-			// mouse up event
-			document.addEventListener("mouseup", (evt)=>{
-				document.getElementsByTagName("body")[0].style.cursor = "default";
-				this.mouseDown = false;
-			});
-
-			document.addEventListener(
-				"mousemove",
-				(evt)=>{
-					let movementX = evt.movementX || evt.mozMovementX || evt.webkitMovementX || 0;
-					let movementY = evt.movementY || evt.mozMovementY || evt.webkitMovementY || 0;
-
-					if (this.mouseDown) {
-						document.getElementsByTagName("body")[0].style.cursor = "grabbing";
-						this.camera.rotation.y -= -movementX / 600;
-						this.camera.rotation.x -= -movementY / 600;
-					}
-				},
-				false
-			);
-		},
-
-		// on mouse move
-		onDocumentMouseMove: function (event){
+		onMouseMove(event){
 			event.preventDefault();
-			// console.log('log of this:'+ this);
-			this.objects = [];
-			this.objects.push(this.mesh.children[53]);
 			this.mouse.set(
 				(event.clientX / this.renderer.domElement.innerWidth) * 2 - 1,
 				-(event.clientY / this.renderer.domElement.innerHeight) * 2 + 1
 			);
 
 			this.raycaster.setFromCamera(this.mouse, this.camera);
+			this.intersects = this.raycaster.intersectObjects(this.targetObjects);
 
-			// ray will intersect with objects added to array named objects
-			this.intersects = this.raycaster.intersectObjects(this.objects);
-
-			/*
-			the picking ray will intersects with one or more of all objects in the scene
-			let intersects = raycaster.intersectObjects(scene.children);
-			*/
-			if(this.intersects.length > 0){
+			if(this.intersects.length){
 				let intersect = this.intersects[0];
-				this.circleRoller.position.copy(intersect.point).add(intersect.face.normal);
+				this.circleOverHelper.position.copy(intersect.point).add(intersect.face.normal);
 			}
 		},
 
-
-		// mouse down
-		onDocumentMouseDown: function(event){
+		onMouseDown(event){
 			event.preventDefault();
-			this.objects = [];
-			this.objects.push(this.mesh.children[0].children[0].children[0].children[16]);
 			this.mouse.set(
 				(event.clientX / this.renderer.domElement.clientWidth) * 2 - 1,
 				-(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1
 			);
 
 			this.raycaster.setFromCamera(this.mouse, this.camera);
-			this.intersects = this.raycaster.intersectObjects(this.objects);
+			this.intersects = this.raycaster.intersectObjects(this.targetObjects);
 
-			if(this.intersects.length > 0){
+			if(this.intersects.length){
 				let intersect = this.intersects[0];
+				console.log(intersect.object.name);
 
-				// here is the magic 🤩🤩
-				// Move camera 🎉🎉🎉🎉🎉🎉🎉
-				gsap.to(this.camera.position, 2, {
-					x: intersect.point.x,
-					z: intersect.point.z,
-					ease: "Power1.easeInOut",
-					onUpdate: () => {
-						this.camera.updateProjectionMatrix();
-					},
-					onComplete: () =>{
-						console.log('animatin ends');
-					}
-				});
-
+				if(intersect.object.name === 'red_floor' || intersect.object.name === 'white_floor'){
+					// here is the magic 🤩🤩
+					// Move camera 🎉🎉🎉🎉🎉🎉🎉
+					gsap.to(this.camera.position, {
+						x: intersect.point.x,
+						z: intersect.point.z,
+						ease: "Power1.easeInOut",
+						onUpdate: () => {
+							this.camera.updateProjectionMatrix();
+						},
+						onComplete: () => {
+							console.log('animation ends');
+						}
+					}).duration(2);
+				}
 			}
-		}
+		},
 
+		onWindowResize() {
+            this.renderer.setSize(this.sceneSpace.clientWidth, this.sceneSpace.clientHeight);
+            this.camera.aspect = this.sceneSpace.clientWidth / this.sceneSpace.clientHeight;
+            this.camera.updateProjectionMatrix();
+        },
 	},
 
 	mounted() {
 		this.init();
-    	document.addEventListener("mousedown", this.onDocumentMouseDown, false);
-		window.addEventListener('resize', () => {this.onWindowResize()}, false);
+		this.initControls();
+    	this.sceneSpace.addEventListener("mousemove", this.onMouseMove, false);
+        this.sceneSpace.addEventListener("mousedown", this.onMouseDown, false);
+        window.addEventListener('resize', this.onWindowResize, false);
 	},
 
 	created(){

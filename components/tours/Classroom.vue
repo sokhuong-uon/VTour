@@ -30,23 +30,13 @@ export default {
             stats: null,
             camera: null,
             scene: null,
-            controls: null,
             raycaster: null,
-            group: null,
-            mesh: null,
+			targetObjects: null,
+			outLine: null,
+            circleOverHelper: null,
 
             mouse: null,
             mouseDown: null,
-
-            circleRoller: null,
-            circleRollerGeo: null,
-            circleRollerMaterial: null,
-
-            outLineMaterial: null,
-            outLine: null,
-
-            objects: null,
-            intersects: null,
         }
     },
 
@@ -62,7 +52,7 @@ export default {
 				const near = 0.1;
 				const far = 1000;
 				this.camera = new PerspectiveCamera(fov, aspect, near, far);
-				this.camera.position.set(0,10,10);
+				this.camera.position.set(0,12,10);
 			}
 
 			// Scene
@@ -74,6 +64,7 @@ export default {
 			// WebGL Renderer
 			{
 				this.renderer = new WebGLRenderer({antialias: true});
+				this.renderer.name = "Renderer";
 				this.renderer.setPixelRatio(this.sceneSpace.devicePixelRatio);
 				this.renderer.setSize(this.sceneSpace.clientWidth, this.sceneSpace.clientHeight);
 				this.renderer.outputEncoding = sRGBEncoding;
@@ -85,13 +76,8 @@ export default {
 			// Stats
 			{
 				this.stats = new Stats();
+				this.stats.name = "Stats Bar"
 				this.sceneSpace.appendChild(this.stats.domElement);
-			}
-
-			// Group
-			{
-				this.group = new Group();
-				this.scene.add(this.group);
 			}
 
 			// Light
@@ -99,6 +85,7 @@ export default {
 				const color = 0x555555;
 				const intensity = 2;
 				const ambientLight = new AmbientLight(color, intensity);
+				ambientLight.name = "Ambient Light";
 				this.scene.add(ambientLight);
 			}
 
@@ -109,19 +96,21 @@ export default {
 				loader.load(
 					'../../gltf/lowpoly_stylized_classroom/scene.gltf',
 
-					// called when the resource is loaded
+					// Call when the resource is loaded
 					(gltf) => {
+						gltf.scene.name = "GLTF Scene"
 						this.scene.add(gltf.scene);
-						this.mesh = gltf.scene.children[0].children[0].children[0];
+						this.targetObjects = gltf.scene.children[0].children[0].children[0].children;
+						console.log(this.targetObjects);
 					},
 
-					// called while loading is progressing
-					function (xhr) {
+					// Call while loading is progressing
+					(xhr) => {
 						console.log((xhr.loaded / xhr.total * 100) + '% loaded');
 					},
 
-					// called when loading has errors
-					function (error) {
+					// Call when loading has errors
+					(error) => {
 						console.log('An error happened');
 					}
 				);
@@ -129,28 +118,28 @@ export default {
 
             // Circle roller
 			{
-				this.circleRollerGeo = new CircleBufferGeometry(1, 100,);
-				this.circleRollerMaterial = new LineBasicMaterial({
+				const circleRollerGeo = new CircleBufferGeometry(1, 100,);
+				const circleRollerMaterial = new LineBasicMaterial({
 					color: 0xffffff,
 					opacity: .8,
 					transparent: false
 				});
+				this.circleOverHelper = new Mesh(circleRollerGeo, circleRollerMaterial);
+				this.circleOverHelper.rotateX(Math.PI / 2);
 
-				this.circleRoller = new Mesh(this.circleRollerGeo, this.circleRollerMaterial);
-				this.circleRoller.rotateX(Math.PI / 2);
-
-				this.scene.add(this.circleRoller);
-
-				this.outLineMaterial = new MeshBasicMaterial({
+				const outLineMaterial = new MeshBasicMaterial({
 					color: 0xffffff,
 					opacity: 1,
 					side: DoubleSide
 				});
-
-				this.outLine = new Mesh(this.circleRollerGeo, this.outLineMaterial);
-				this.outLine.position = this.circleRoller.position;
+				console.log("arrived");
+				this.outLine = new Mesh(circleRollerGeo, outLineMaterial);
+				this.outLine.position = this.circleOverHelper.position;
 				this.outLine.scale.multiplyScalar(.7);
-				this.circleRoller.add(this.outLine);
+
+				this.circleOverHelper.add(this.outLine);
+				this.circleOverHelper.name = "Circle Helper";
+				this.scene.add(this.circleOverHelper);
 			}
 
             // Raycaster
@@ -159,6 +148,7 @@ export default {
 			// Mouse
             this.mouse = new Vector2();
 
+			this.renderer.setAnimationLoop(this.animate);
         },
 
         animate() {
@@ -196,42 +186,41 @@ export default {
             },false);
         },
 
-        onDocumentMouseMove(event) {
-
+        onMouseMove(event) {
+			event.preventDefault();
             this.mouse.set(
                 (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1,
                 -(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1
             );
 
             this.raycaster.setFromCamera(this.mouse, this.camera);
-            this.intersects = this.raycaster.intersectObjects(this.scene.children[3].children[0].children[0].children[0].children);
+            let intersects = this.raycaster.intersectObjects(this.targetObjects);
 
-            if (this.intersects.length) {
+            if (intersects.length) {
+                let intersect = intersects[0];
 
-                let intersect = this.intersects[0];
-
-                if (intersect.object.id == 72){
-                    this.circleRoller.position = intersect.point
+                if (intersect.object.id == 71){ // Not a good approach becuase id may change based on order of object
+                    this.circleOverHelper.position = intersect.point
                 }
             }
         },
 
-        onDocumentMouseDown(event) {
+        onMouseDown(event) {
+			event.preventDefault();
             this.mouse.set(
                 (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1,
                 -(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1
             );
 
             this.raycaster.setFromCamera(this.mouse, this.camera);
-            this.intersects = this.raycaster.intersectObjects(this.scene.children[3].children[0].children[0].children[0].children);
+            let intersects = this.raycaster.intersectObjects(this.targetObjects);
 
-            if (this.intersects.length) {
-
-                let intersect = this.intersects[0];
+            if (intersects.length) {
+                let intersect = intersects[0];
 
                 // Here is the magic 🤩🤩
                 // Move camera 🎉🎉🎉🎉🎉🎉🎉
-                if (intersect.object.id == 72){
+                if (intersect.object.id == 71){ // Not a good approach becuase id may change based on order of object
 
                     gsap.to(this.camera.position, {
                         x: intersect.point.x,
@@ -245,7 +234,6 @@ export default {
                         }
                     }).duration(2);
 				}
-
             }
         },
 
@@ -259,9 +247,8 @@ export default {
     mounted() {
         this.init();
 		this.initControls();
-		this.animate();
-        document.addEventListener("mousemove", this.onDocumentMouseMove, false);
-        document.addEventListener("mousedown", this.onDocumentMouseDown, false);
+        this.sceneSpace.addEventListener("mousemove", this.onMouseMove, false);
+        this.sceneSpace.addEventListener("mousedown", this.onMouseDown, false);
         window.addEventListener('resize', this.onWindowResize, false);
     },
 
