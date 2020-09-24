@@ -62,7 +62,9 @@ export default {
 
 			// Directional light
 			{
-				this.light = new DirectionalLight(0xb5edf5, 1);
+				const color = 0xb5edf5;
+				const intensity = 1;
+				this.light = new DirectionalLight(color, intensity);
 				this.light.name = "directional light"
 				this.light.position.set(0, 0, 20);
 				this.light.lookAt(0,0,0);
@@ -86,7 +88,7 @@ export default {
 				const boxHeight = 1;
 				const boxDepth = 1;
 				const geometry = new BoxGeometry(boxWidth, boxHeight, boxDepth);
-				const material = new MeshPhongMaterial({color: 0x851141}); //Materila that reflect the light
+				const material = new MeshPhongMaterial({color: 0x851141}); //Materila that affected by lights
 
 				for(let i=0; i<=5; i++){
 					const cube = new Mesh(geometry, material);
@@ -98,6 +100,7 @@ export default {
 
 			// Raycaster
 			this.raycaster = new Raycaster();
+
 			// Mouse
 			this.mouse = new Vector2(); // x, y
 		},
@@ -139,7 +142,7 @@ export default {
 	mounted() {
 		this.init();
 		this.animate();
-		window.addEventListener('resize', () => {this.onWindowResize()}, false);
+		window.addEventListener('resize', this.onWindowResize, false);
 		window.addEventListener('mousemove', this.onMouseMove);
 	},
 
