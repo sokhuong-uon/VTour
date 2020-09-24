@@ -32,23 +32,13 @@ export default {
             stats: null,
             camera: null,
             scene: null,
-            controls: null,
             raycaster: null,
-            group: null,
-            mesh: null,
+			targetObjects: null,
+            circleOverHelper: null,
+            outLine: null,
 
             mouse: null,
             mouseDown: null,
-
-            circleOverHelper: null,
-            circleRollerGeo: null,
-            circleRollerMaterial: null,
-
-            outLineMaterial: null,
-            outLine: null,
-
-            intersects: null,
-			targetObjects: null
 		}
 	},
 	methods: {
@@ -63,6 +53,7 @@ export default {
 				const near = 0.1;
 				const far = 70000;
 				this.camera = new PerspectiveCamera(fov, aspect, near, far);
+				this.camera.name = "Camera";
 				this.camera.position.set(0,0,500);
 				this.camera.rotateY(-Math.PI / 2);
 			}
@@ -88,6 +79,7 @@ export default {
 			// Stats
 			{
 				this.stats = new Stats();
+				this.stats.name = "Stats";
 				this.sceneSpace.appendChild(this.stats.domElement);
 			}
 
@@ -108,15 +100,13 @@ export default {
 
 					// Call when the resource is loaded
 					( gltf )=> {
+						gltf.scene.name = "GLTF Scene";
+						gltf.scene.position.y -= 1000;
+						gltf.scene.position.z += 6500;
 						this.scene.add(gltf.scene);
-						this.mesh = gltf.scene.children[0];
-						this.mesh.position.y -= 1000;
-						this.mesh.position.z += 5500;
-						// this.mesh.scale.set(0.1, 0.1, 0.1);
-						// console.log(this.mesh); //gltf scene
 
 						this.targetObjects = gltf.scene.children[0].children[0].children[0].children[0].children;
-						console.log(this.targetObjects);
+						// console.log(this.targetObjects);
 						// console.log(this.mesh.children[0].children[0]); // Gym
 						// console.log(this.mesh.children[0].children[0].children[0]); // Models
 						// console.log(this.mesh.children[0].children[0].children[0].children[15]); // red floor
@@ -138,25 +128,26 @@ export default {
 
 			// Circle roller
 			{
-				this.circleRollerGeo = new CircleBufferGeometry(1, 100,);
-				this.circleRollerMaterial = new LineBasicMaterial({
+				const circleRollerGeo = new CircleBufferGeometry(1, 100,);
+				const circleRollerMaterial = new LineBasicMaterial({
 					color: 0xffffff,
 					opacity: .8,
 					transparent: false
 				});
 
-				this.circleOverHelper = new Mesh(this.circleRollerGeo, this.circleRollerMaterial);
+				this.circleOverHelper = new Mesh(circleRollerGeo, circleRollerMaterial);
+				this.circleOverHelper.name = "Cricle Helper"
 				this.circleOverHelper.rotateX(Math.PI / 2);
 
 				this.scene.add(this.circleOverHelper);
 
-				this.outLineMaterial = new MeshBasicMaterial({
+				const outLineMaterial = new MeshBasicMaterial({
 					color: 0xffffff,
 					opacity: 1,
 					side: DoubleSide
 				});
 
-				this.outLine = new Mesh(this.circleRollerGeo, this.outLineMaterial);
+				this.outLine = new Mesh(circleRollerGeo, outLineMaterial);
 				this.outLine.position = this.circleOverHelper.position;
 				this.outLine.scale.multiplyScalar(.7);
 				this.circleOverHelper.add(this.outLine);
@@ -215,11 +206,11 @@ export default {
 			);
 
 			this.raycaster.setFromCamera(this.mouse, this.camera);
-			this.intersects = this.raycaster.intersectObjects(this.targetObjects);
+			let intersects = this.raycaster.intersectObjects(this.targetObjects);
 
-			if(this.intersects.length){
-				let intersect = this.intersects[0];
-				this.circleOverHelper.position.copy(intersect.point).add(intersect.face.normal);
+			if(intersects.length){
+				let intersect = intersects[0];
+				this.circleOverHelper.position = intersect.point
 			}
 		},
 
@@ -231,11 +222,11 @@ export default {
 			);
 
 			this.raycaster.setFromCamera(this.mouse, this.camera);
-			this.intersects = this.raycaster.intersectObjects(this.targetObjects);
+			let intersects = this.raycaster.intersectObjects(this.targetObjects);
 
-			if(this.intersects.length){
-				let intersect = this.intersects[0];
-				console.log(intersect.object.name);
+			if(intersects.length){
+				let intersect = intersects[0];
+				// console.log(intersect.object.name);
 
 				if(intersect.object.name === 'red_floor' || intersect.object.name === 'white_floor'){
 					// here is the magic 🤩🤩

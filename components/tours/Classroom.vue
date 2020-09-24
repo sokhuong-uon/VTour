@@ -52,6 +52,7 @@ export default {
 				const near = 0.1;
 				const far = 1000;
 				this.camera = new PerspectiveCamera(fov, aspect, near, far);
+				this.camera.name = "Camera";
 				this.camera.position.set(0,12,10);
 			}
 
@@ -101,7 +102,7 @@ export default {
 						gltf.scene.name = "GLTF Scene"
 						this.scene.add(gltf.scene);
 						this.targetObjects = gltf.scene.children[0].children[0].children[0].children;
-						console.log(this.targetObjects);
+						// console.log(this.targetObjects);
 					},
 
 					// Call while loading is progressing

@@ -12,7 +12,11 @@
 
 
 <script>
-import * as THREE from 'three';
+
+import {
+	PerspectiveCamera, AmbientLight, Scene, WebGLRenderer, Mesh
+} from 'three';
+import Stats from '../../node_modules/three/examples/jsm/libs/stats.module.js';
 import {GLTFLoader} from '../../node_modules/three/examples/jsm/loaders/GLTFLoader.js';
 import {OrbitControls} from '../../node_modules/three/examples/jsm/controls/OrbitControls.js';
 import {DRACOLoader} from '../../node_modules/three/examples/jsm/loaders/DRACOLoader.js';
@@ -21,110 +25,119 @@ export default {
 	name: 'SwampLocation',
 	data() {
 		return {
+			sceneSpace: null,
 			camera: null,
 			scene: null,
 			renderer: null,
+			stats: null,
 			controls: null,
-			mesh: null,
 		}
 	},
 	methods: {
-		init: function() {
-			console.log(CricleOver);
-			const sceneSpace = document.getElementById('sceneSpace');
+		init() {
+			// Container
+            this.sceneSpace = document.getElementById('sceneSpace');
 
-			this.camera = new THREE.PerspectiveCamera(75, sceneSpace.clientWidth / sceneSpace.clientHeight, 0.1, 1000);
-			this.camera.position.set(0,0,100);
-			// console.log(this.camera);
-			this.camera.rotation.y = -Math.PI;
-			// this.camera.lookAt(0,-250,-250);
+			// Camera
+			{
+				const fov = 75;
+				const aspect = this.sceneSpace.clientWidth / this.sceneSpace.clientHeight;
+				const near = 0.1;
+				const far = 1000;
+				this.camera = new PerspectiveCamera(fov, aspect, near, far);
+				this.camera.name = "Camera";
+				this.camera.position.set(0,0,100);
+				this.camera.rotation.y = -Math.PI;
+			}
 
-			this.scene = new THREE.Scene();
+			// Scene
+			{
+				this.scene = new Scene();
+				this.scene.name  = "Scene";
+			}
 
-			const ambient = new THREE.AmbientLight(0x777777, 2);
-    		this.scene.add(ambient);
-			// console.log(this);
+			// WebGL Renderer
+			{
+				this.renderer = new WebGLRenderer({antialias: true});
+				this.renderer.name = "Renderer";
+				this.renderer.setPixelRatio(this.sceneSpace.devicePixelRatio);
+				this.renderer.setSize(this.sceneSpace.clientWidth, this.sceneSpace.clientHeight);
+				this.renderer.shadowMap.enabled = true;
+				this.sceneSpace.appendChild(this.renderer.domElement);
+			}
 
+			// Stats
+			{
+				this.stats = new Stats();
+				this.stats.name = "Stats Bar"
+				this.sceneSpace.appendChild(this.stats.domElement);
+			}
 
+			// Light
+			{
+				const color = 0x666666;
+				const intensity = 2;
+				const ambientLight = new AmbientLight(color, intensity);
+				ambientLight.name = "Ambient Light";
+				this.scene.add(ambientLight);
+			}
 
-			// Instantiate a loader
-			const loader = new GLTFLoader();
+			// Load GLTF
+			{
+				const loader = new GLTFLoader();
 
-			// Load a glTF resource
-			loader.load(
-				// resource URL
-				'../../gltf/swamp_location/scene.gltf',
+				loader.load(
+					'../../gltf/swamp_location/scene.gltf',
 
-				// called when the resource is loaded
-				( gltf )=> {
-					console.log(gltf);
-					this.scene.add(gltf.scene);
-					this.mesh = gltf.scene.children[0]
-					// this.mesh.position.y += 140;
-					// this.mesh.rotation.z = -Math.PI;
-					// console.log(this.mesh);
+					// Call when the resource is loaded
+					(gltf) => {
+						gltf.scene.name = "GLTF Scene";
+						this.scene.add(gltf.scene);
+					},
 
-				},
+					// Call while loading is progressing
+					(xhr) => {
+						console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+					},
 
-				// called while loading is progressing
-				function ( xhr ) {
+					// Call when loading has errors
+					(error) => {
+						console.log('An error happened');
+					}
+				);
+			}
 
-					console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+			// Orbit Controls
+			{
+				this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+				this.controls.target.set(0,0,0);
+				this.controls.update();
+			}
 
-				},
-
-				// called when loading has errors
-				function ( error ) {
-
-					console.log( 'An error happened' );
-					// console.log(error);
-
-				}
-			);
-
-
-
-			this.renderer = new THREE.WebGLRenderer({antialias: true});
-			this.renderer.outputEncoding = THREE.sRGBEncoding;
-			this.renderer.setSize(sceneSpace.clientWidth, sceneSpace.clientHeight);
-			this.renderer.shadowMap.enabled = true;
-			this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-			this.renderer.setPixelRatio(sceneSpace.devicePixelRatio);
-
-			sceneSpace.appendChild(this.renderer.domElement);
-
-			this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-			this.controls.target.set(0,0,0);
-			this.controls.update();
-
+			this.renderer.setAnimationLoop(this.animate);
 		},
 
-		animate: function() {
-			requestAnimationFrame(this.animate);
-			this.renderer.render(this.scene, this.camera);
-		},
+		animate() {
+			setTimeout( () => {
+				requestAnimationFrame( this.animate );
+				this.renderer.render(this.scene, this.camera);
+				this.stats.update();
+			}, 1000 / 60);	// 60 fps, 1000/30 for 30 fps
+        },
 
-		onWindowResize(){
-			this.renderer.setSize(sceneSpace.clientWidth, sceneSpace.clientHeight);
-			this.camera.aspect = sceneSpace.clientWidth / sceneSpace.clientHeight;
-			this.camera.updateProjectionMatrix();
-		}
-
+		onWindowResize() {
+            this.renderer.setSize(this.sceneSpace.clientWidth, this.sceneSpace.clientHeight);
+            this.camera.aspect = this.sceneSpace.clientWidth / this.sceneSpace.clientHeight;
+            this.camera.updateProjectionMatrix();
+        },
 	},
 
 	mounted() {
 		this.init();
-		this.animate();
-		window.addEventListener('resize', () => {this.onWindowResize()}, false);
+		window.addEventListener('resize', this.onWindowResize, false);
 	},
 
 	created(){
 	}
 }
 </script>
-<style lang="css">
-*{
-	margin: 0;
-	padding: 0;
-}
-</style>
