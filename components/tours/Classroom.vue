@@ -26,17 +26,17 @@ export default {
     data() {
         return {
 			sceneSpace: null,
+            renderer: null,
+            stats: null,
             camera: null,
             scene: null,
-            renderer: null,
             controls: null,
+            raycaster: null,
+            group: null,
             mesh: null,
 
             mouse: null,
             mouseDown: null,
-            raycaster: null,
-            isShifDown: false,
-            stats: null,
 
             circleRoller: null,
             circleRollerGeo: null,
@@ -45,12 +45,8 @@ export default {
             outLineMaterial: null,
             outLine: null,
 
-            objects: [],
+            objects: null,
             intersects: null,
-            group: null,
-
-			delta: 1000 / 60,
-			timeTarget: 0
         }
     },
 
@@ -84,7 +80,10 @@ export default {
 				this.renderer.shadowMap.enabled = true;
 				this.renderer.shadowMap.type = PCFSoftShadowMap;
 				this.sceneSpace.appendChild(this.renderer.domElement);
+			}
 
+			// Stats
+			{
 				this.stats = new Stats();
 				this.sceneSpace.appendChild(this.stats.domElement);
 			}
@@ -97,7 +96,9 @@ export default {
 
 			// Light
 			{
-				const ambientLight = new AmbientLight(0x555555, 2);
+				const color = 0x555555;
+				const intensity = 2;
+				const ambientLight = new AmbientLight(color, intensity);
 				this.scene.add(ambientLight);
 			}
 
@@ -171,19 +172,19 @@ export default {
         initControls() {
             this.camera.rotation.order = "YXZ";
 
-            // mouse down event
-            document.addEventListener("mousedown", (evt) => {
+            // Mouse down
+            this.sceneSpace.addEventListener("mousedown", (evt) => {
                 this.mouseDown = true;
                 this.sceneSpace.style.cursor = "grab";
-            });
+            }, false);
 
-            // mouse up event
-            document.addEventListener("mouseup", (evt) => {
+            // Mouse up
+            this.sceneSpace.addEventListener("mouseup", (evt) => {
                 this.sceneSpace.style.cursor = "default";
                 this.mouseDown = false;
-            });
+            }, false);
 
-            document.addEventListener("mousemove", (evt) => {
+            this.sceneSpace.addEventListener("mousemove", (evt) => {
 				let movementX = evt.movementX || evt.mozMovementX || evt.webkitMovementX || 0;
 				let movementY = evt.movementY || evt.mozMovementY || evt.webkitMovementY || 0;
 
@@ -203,28 +204,18 @@ export default {
             );
 
             this.raycaster.setFromCamera(this.mouse, this.camera);
-
-            // ray will intersect with objects added to array named objects
-            // this.intersects = this.raycaster.intersectObjects(this.objects);
             this.intersects = this.raycaster.intersectObjects(this.scene.children[3].children[0].children[0].children[0].children);
-
-            /*
-            the picking ray will intersects with one or more of all objects in the scene
-            let intersects = raycaster.intersectObjects(scene.children);
-            */
 
             if (this.intersects.length) {
 
                 let intersect = this.intersects[0];
 
                 if (intersect.object.id == 72){
-                    // this.circleRoller.position.copy(intersect.point).add(intersect.face.normal);
                     this.circleRoller.position = intersect.point
                 }
             }
         },
 
-        // mouse down
         onDocumentMouseDown(event) {
             this.mouse.set(
                 (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1,
@@ -232,18 +223,17 @@ export default {
             );
 
             this.raycaster.setFromCamera(this.mouse, this.camera);
-            // this.intersects = this.raycaster.intersectObjects(this.objects);
             this.intersects = this.raycaster.intersectObjects(this.scene.children[3].children[0].children[0].children[0].children);
 
             if (this.intersects.length) {
 
                 let intersect = this.intersects[0];
 
-                // here is the magic 🤩🤩
+                // Here is the magic 🤩🤩
                 // Move camera 🎉🎉🎉🎉🎉🎉🎉
                 if (intersect.object.id == 72){
 
-                    gsap.to(this.camera.position, 2, {
+                    gsap.to(this.camera.position, {
                         x: intersect.point.x,
                         z: intersect.point.z,
                         ease: "Power1.easeInOut",
@@ -253,7 +243,7 @@ export default {
                         onComplete: () => {
                             console.log('animation ends');
                         }
-                    });
+                    }).duration(2);
 				}
 
             }

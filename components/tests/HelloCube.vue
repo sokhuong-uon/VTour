@@ -143,7 +143,7 @@ export default {
 		this.init();
 		this.animate();
 		window.addEventListener('resize', this.onWindowResize, false);
-		window.addEventListener('mousemove', this.onMouseMove);
+		window.addEventListener('mousemove', this.onMouseMove, false);
 	},
 
 	created(){
