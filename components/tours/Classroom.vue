@@ -7,6 +7,10 @@
             <p>Source: <a target="_blank" href="https://sketchfab.com/3d-models/montemor-o-novos-castle-c3c42b291c9a42e5882cacd3330c04ef"><span class="text-indigo-500">Montemor-o-Novo's Castle</span></a></p>
         </div>
     </div>
+	<div class="absolute right-4 bottom-4 w-18 h-10 bg-gray-700">
+		<button v-if="inRoom" @click="exitRoon"  class="w-18 h-10 text-gray-400 font-semibold">Exit</button>
+		<button v-else @click="enterRoon" class="w-18 h-10 text-gray-400 font-semibold">Enter</button>
+	</div>
 </div>
 </template>
 
@@ -15,7 +19,7 @@
 import {
 	PerspectiveCamera, AmbientLight, Scene, WebGLRenderer, Mesh, Raycaster,
 	LineBasicMaterial, CircleBufferGeometry, MeshBasicMaterial, Vector2,
-	DoubleSide, sRGBEncoding, PCFSoftShadowMap, Group
+	DoubleSide, sRGBEncoding, PCFSoftShadowMap, Group, AxesHelper
 } from 'three';
 import gsap from 'gsap';
 import Stats from '../../node_modules/three/examples/jsm/libs/stats.module.js';
@@ -25,6 +29,7 @@ export default {
     name: 'Classroom',
     data() {
         return {
+			inRoom: false,
 			sceneSpace: null,
             renderer: null,
             stats: null,
@@ -37,6 +42,7 @@ export default {
 
             mouse: null,
             mouseDown: null,
+			tl:null
         }
     },
 
@@ -54,13 +60,20 @@ export default {
 				const far = 1000;
 				this.camera = new PerspectiveCamera(fov, aspect, near, far);
 				this.camera.name = "Camera";
-				this.camera.position.set(0,12,10);
+				this.camera.position.set(0,5,20);
+				this.camera.destination = {x: 0, y: 5, z: 20}
 			}
 
 			// Scene
 			{
 				this.scene = new Scene();
 				this.scene.name  = "Scene";
+			}
+
+			// Helper
+			{
+				let helper = new AxesHelper(100);
+				this.scene.add(helper);
 			}
 
 			// WebGL Renderer
@@ -100,9 +113,11 @@ export default {
 
 					// Call once loaded
 					(gltf) => {
-						gltf.scene.name = "GLTF Scene"
+						gltf.scene.name = "GLTF Scene";
+						gltf.scene.scale.set(0.2,0.2, 0.2);
 						this.scene.add(gltf.scene);
 						this.targetObjects = gltf.scene.children[0].children[0].children[0].children;
+						console.log(this.targetObjects);
 					},
 
 					// Call while loading
@@ -198,7 +213,7 @@ export default {
             if (intersects.length) {
                 let intersect = intersects[0];
 
-                if (intersect.object.id == 71){ // Not a good approach becuase id may change based on order of object
+                if (intersect.object.id == 344){ // Not a good approach becuase id may change based on order of object
                     this.circleOverHelper.position = intersect.point
                 }
             }
@@ -219,7 +234,7 @@ export default {
 
                 // Here is the magic 🤩🤩
                 // Move camera 🎉🎉🎉🎉🎉🎉🎉
-                if (intersect.object.id == 71){ // Not a good approach becuase id may change based on order of object
+                if (intersect.object.id == 344){ // Not a good approach becuase id may change based on order of object
 
                     gsap.to(this.camera.position, {
                         x: intersect.point.x,
@@ -235,6 +250,27 @@ export default {
 				}
             }
         },
+
+		enterRoon(){
+			this.inRoom = true;
+			this.tl = gsap.timeline({});
+			this.tl.to(this.camera.position,{
+				duration: 1,
+				y: 2,
+				z: 2,
+				ease:"Power1.InOut",
+				onUpdate: ()=>this.camera.updateProjectionMatrix(),
+				onComplete:()=>{}
+			}).to(this.scene.rotation,{
+				duration: 1,
+				y: 10,
+				ease:"Power1",
+			}, "-=0.5")
+		},
+		exitRoon(){
+			this.inRoom = false;
+			this.tl.reverse();
+		},
 
 		onWindowResize() {
             this.renderer.setSize(this.sceneSpace.clientWidth, this.sceneSpace.clientHeight);
