@@ -1,5 +1,8 @@
 <template>
-<HelloCube v-if="$route.params.id == 'hellocube'"/>
+<div>
+	<HelloCube v-if="$route.params.id == 'hellocube'"/>
+	<Responsive v-if="$route.params.id == 'responsive'"/>
+</div>
 </template>
 
 <script>

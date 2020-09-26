@@ -98,7 +98,7 @@ export default {
 				loader.load(
 					'../../gltf/avenue_tennis_-_main_gym_2018/scene.gltf',
 
-					// Call when the resource is loaded
+					// Call once loaded
 					( gltf )=> {
 						gltf.scene.name = "GLTF Scene";
 						gltf.scene.position.y -= 1000;
@@ -114,14 +114,14 @@ export default {
 
 					},
 
-					// Call while loading is progressing
-					( xhr ) => {
-						console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+					// Call while loading
+					(xhr) => {
+						console.log((xhr.loaded / xhr.total * 100) + '% loaded');
 					},
 
-					// Call when loading has errors
-					( error ) => {
-						console.log( 'An error happened' );
+					// Call when errors
+					(error) => {
+						console.log('An error happened');
 					}
 				);
 			}
@@ -165,7 +165,6 @@ export default {
 
 		animate() {
 			setTimeout( () => {
-				requestAnimationFrame( this.animate );
 				this.renderer.render(this.scene, this.camera);
 				this.stats.update();
 			}, 1000 / 60);	// 60 fps, 1000/30 for 30 fps

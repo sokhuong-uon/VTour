@@ -51,6 +51,7 @@ export default {
 				const near = 0.1;
 				const far = 1000;
 				this.camera = new PerspectiveCamera(fov, aspect, near, far);
+				this.name = "Camera";
 				this.camera.position.set(0,0,5);
 			}
 
@@ -65,9 +66,8 @@ export default {
 				const color = 0xb5edf5;
 				const intensity = 1;
 				this.light = new DirectionalLight(color, intensity);
-				this.light.name = "directional light"
+				this.light.name = "Directional light"
 				this.light.position.set(0, 0, 20);
-				this.light.lookAt(0,0,0);
 				this.scene.add(this.light);
 			}
 
@@ -107,8 +107,7 @@ export default {
 			this.renderer.setAnimationLoop(this.animate);
 		},
 
-		animate() {
-			requestAnimationFrame(this.animate);
+		animate(){
 			this.renderer.render(this.scene, this.camera);
 		},
 		onMouseMove(event){
@@ -143,7 +142,6 @@ export default {
 
 	mounted() {
 		this.init();
-		this.animate();
 		window.addEventListener('resize', this.onWindowResize, false);
 		window.addEventListener('mousemove', this.onMouseMove, false);
 	},

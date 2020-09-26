@@ -44,6 +44,7 @@ export default {
         init() {
 			// Container
             this.sceneSpace = document.getElementById('sceneSpace');
+			this.sceneSpace.name = "Scene Space";
 
 			// Camera
 			{
@@ -97,20 +98,19 @@ export default {
 				loader.load(
 					'../../gltf/lowpoly_stylized_classroom/scene.gltf',
 
-					// Call when the resource is loaded
+					// Call once loaded
 					(gltf) => {
 						gltf.scene.name = "GLTF Scene"
 						this.scene.add(gltf.scene);
 						this.targetObjects = gltf.scene.children[0].children[0].children[0].children;
-						// console.log(this.targetObjects);
 					},
 
-					// Call while loading is progressing
+					// Call while loading
 					(xhr) => {
 						console.log((xhr.loaded / xhr.total * 100) + '% loaded');
 					},
 
-					// Call when loading has errors
+					// Call when errors
 					(error) => {
 						console.log('An error happened');
 					}
@@ -133,7 +133,6 @@ export default {
 					opacity: 1,
 					side: DoubleSide
 				});
-				console.log("arrived");
 				this.outLine = new Mesh(circleRollerGeo, outLineMaterial);
 				this.outLine.position = this.circleOverHelper.position;
 				this.outLine.scale.multiplyScalar(.7);
@@ -154,7 +153,6 @@ export default {
 
         animate() {
 			setTimeout( () => {
-				requestAnimationFrame( this.animate );
 				this.renderer.render(this.scene, this.camera);
 				this.stats.update();
 			}, 1000 / 60);	// 60 fps, 1000/30 for 30 fps

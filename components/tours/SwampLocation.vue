@@ -37,6 +37,7 @@ export default {
 		init() {
 			// Container
             this.sceneSpace = document.getElementById('sceneSpace');
+			this.sceneSpace.name = "Scene Space";
 
 			// Camera
 			{
@@ -46,7 +47,7 @@ export default {
 				const far = 1000;
 				this.camera = new PerspectiveCamera(fov, aspect, near, far);
 				this.camera.name = "Camera";
-				this.camera.position.set(0,0,100);
+				this.camera.position.set(0,10,50);
 				this.camera.rotation.y = -Math.PI;
 			}
 
@@ -60,7 +61,7 @@ export default {
 			{
 				this.renderer = new WebGLRenderer({antialias: true});
 				this.renderer.name = "Renderer";
-				this.renderer.setPixelRatio(this.sceneSpace.devicePixelRatio);
+				this.renderer.setPixelRatio(window.devicePixelRatio);
 				this.renderer.setSize(this.sceneSpace.clientWidth, this.sceneSpace.clientHeight);
 				this.renderer.shadowMap.enabled = true;
 				this.sceneSpace.appendChild(this.renderer.domElement);
@@ -75,8 +76,8 @@ export default {
 
 			// Light
 			{
-				const color = 0x666666;
-				const intensity = 2;
+				const color = 0x777777;
+				const intensity = 4;
 				const ambientLight = new AmbientLight(color, intensity);
 				ambientLight.name = "Ambient Light";
 				this.scene.add(ambientLight);
@@ -89,18 +90,18 @@ export default {
 				loader.load(
 					'../../gltf/swamp_location/scene.gltf',
 
-					// Call when the resource is loaded
+					// Call once loaded
 					(gltf) => {
 						gltf.scene.name = "GLTF Scene";
 						this.scene.add(gltf.scene);
 					},
 
-					// Call while loading is progressing
+					// Call while loading
 					(xhr) => {
 						console.log((xhr.loaded / xhr.total * 100) + '% loaded');
 					},
 
-					// Call when loading has errors
+					// Call when errors
 					(error) => {
 						console.log('An error happened');
 					}
@@ -119,7 +120,6 @@ export default {
 
 		animate() {
 			setTimeout( () => {
-				requestAnimationFrame( this.animate );
 				this.renderer.render(this.scene, this.camera);
 				this.stats.update();
 			}, 1000 / 60);	// 60 fps, 1000/30 for 30 fps
