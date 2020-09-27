@@ -6,6 +6,7 @@
 		<Castle v-if="$route.params.id == 'castle'"/>
 		<Classroom v-if="$route.params.id == 'classroom'"/>
 		<Gym v-if="$route.params.id == 'gym'"/>
+		<GammingRoom v-if="$route.params.id == 'gameroom'"/>
   </div>
 </template>
 
