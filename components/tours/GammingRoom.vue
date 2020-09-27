@@ -2,9 +2,9 @@
 	<div id="sceneSpace" class="relative w-screen h-screen">
 		<div class="flex justify-center absolute w-screen text-gray-500">
 			<div class="text-center">
-				<h1>Gaming Room</h1>
+				<h1>3D Model</h1>
 				<p>Author: <a target="_blank" href="https://sketchfab.com/vboichut"><span class="text-indigo-500">Vincent</span></a></p>
-				<p>Source: <a target="_blank" href="https://sketchfab.com/3d-models/gaming-room-47c7c39f767e40eb84d1b1d857af525b"><span class="text-indigo-500">swamp location</span></a></p>
+				<p>Source: <a target="_blank" href="https://sketchfab.com/3d-models/gaming-room-47c7c39f767e40eb84d1b1d857af525b"><span class="text-indigo-500">Gaming Room</span></a></p>
 				<p>Licenses: <a target="_blank" href="http://creativecommons.org/licenses/by/4.0/"><span class="text-indigo-500">CC-BY-4.0</span></a></p>
 			</div>
 		</div>
@@ -71,7 +71,7 @@ export default {
 				const far = 5000;
 				this.camera = new PerspectiveCamera(fov, aspect, near, far);
 				this.camera.name = "Camera";
-				this.camera.position.set(0,45,600);
+				this.camera.position.set(150,300,600);
 				// this.camera.rotation.y = -Math.PI;
 				// this.camera.rotateY(-Math.PI / 2);
 			}
@@ -145,9 +145,7 @@ export default {
 						this.mixer = new AnimationMixer( gltf.scene );
 						let action = this.mixer.clipAction( gltf.animations[ 0 ] );
 						action.play();
-						gltf.scene.children[0].position.set(1000,-100,300);
-						// console.log(gltf.scene.children[0].children[0].children[0].children[0].children[0].children);
-						// console.log(gltf.scene.children[0].children[0].children[0].children[0].children[0].children[63]);
+						gltf.scene.children[0].position.set(1000,-10,300);
 						this.targetObjects.push(gltf.scene.children[0].children[0].children[0].children[0].children[0].children[63].children[0]);
 						this.scene.add(gltf.scene.children[0]);
 					},
@@ -167,6 +165,7 @@ export default {
 
 			this.moveInRoomTween = gsap.to(this.camera.position, {
 				x: this.intersect.point.x,
+				y: 110,
 				z: this.intersect.point.z,
 				ease: "Power3.InOut",
 				duration: 2,
@@ -197,6 +196,7 @@ export default {
 			this.inRoom = true;
 			gsap.to(this.camera.position,{
 				x: 0,
+				y: 110,
 				z: 150,
 				ease: "power3.InOut",
 				duration: 3,
