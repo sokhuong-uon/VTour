@@ -22,9 +22,9 @@ import {
 	Clock
 } from 'three';
 import gsap from 'gsap';
-import Stats from '../../node_modules/three/examples/jsm/libs/stats.module.js';
-import {GLTFLoader} from '../../node_modules/three/examples/jsm/loaders/GLTFLoader.js';
-import {DRACOLoader} from '../../node_modules/three/examples/jsm/loaders/DRACOLoader.js';
+import Stats from '~/node_modules/three/examples/jsm/libs/stats.module.js';
+import {GLTFLoader} from '~/node_modules/three/examples/jsm/loaders/GLTFLoader.js';
+import {DRACOLoader} from '~/node_modules/three/examples/jsm/loaders/DRACOLoader.js';
 
 export default {
 	name: 'GamingRoom',

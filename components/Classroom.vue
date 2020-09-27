@@ -22,8 +22,8 @@ import {
 	DoubleSide, sRGBEncoding, PCFSoftShadowMap, Group, AxesHelper
 } from 'three';
 import gsap from 'gsap';
-import Stats from '../../node_modules/three/examples/jsm/libs/stats.module.js';
-import {GLTFLoader} from '../../node_modules/three/examples/jsm/loaders/GLTFLoader.js';
+import Stats from '~/node_modules/three/examples/jsm/libs/stats.module.js';
+import {GLTFLoader} from '~/node_modules/three/examples/jsm/loaders/GLTFLoader.js';
 
 export default {
     name: 'Classroom',

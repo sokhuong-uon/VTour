@@ -13,9 +13,9 @@
 
 <script>
 import * as THREE from 'three';
-import {GLTFLoader} from '../../node_modules/three/examples/jsm/loaders/GLTFLoader.js';
-import {OrbitControls} from '../../node_modules/three/examples/jsm/controls/OrbitControls.js';
-import {DRACOLoader} from '../../node_modules/three/examples/jsm/loaders/DRACOLoader.js';
+import {GLTFLoader} from '~/node_modules/three/examples/jsm/loaders/GLTFLoader.js';
+import {OrbitControls} from '~/node_modules/three/examples/jsm/controls/OrbitControls.js';
+import {DRACOLoader} from '~/node_modules/three/examples/jsm/loaders/DRACOLoader.js';
 
 export default {
 	name: 'Building',
