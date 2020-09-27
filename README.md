@@ -20,6 +20,8 @@ $ npm run generate
 # Things to check
  When the server up and running, you can check:
 
+  [http://localhost:3000/tours/gameroom](http://localhost:3000/tours/gameroom)
+	
   [http://localhost:3000/tours/classroom](http://localhost:3000/tours/classroom)
 
   [http://localhost:3000/tours/castle](http://localhost:3000/tours/castle)
