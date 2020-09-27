@@ -2,9 +2,10 @@
 	<div id="sceneSpace" class="relative w-screen h-screen">
 		<div class="flex justify-center absolute w-screen text-gray-500">
 			<div class="text-center">
-				<h1>3D Model</h1>
-				<p>Author: <a target="_blank" href="https://sketchfab.com/apsnu"><span class="text-indigo-500">bocharova</span></a></p>
-				<p>Source: <a target="_blank" href="https://sketchfab.com/models/7ede00c0dfe14574bd8f06ee36020609"><span class="text-indigo-500">swamp location</span></a></p>
+				<h1>Gaming Room</h1>
+				<p>Author: <a target="_blank" href="https://sketchfab.com/vboichut"><span class="text-indigo-500">Vincent</span></a></p>
+				<p>Source: <a target="_blank" href="https://sketchfab.com/3d-models/gaming-room-47c7c39f767e40eb84d1b1d857af525b"><span class="text-indigo-500">swamp location</span></a></p>
+				<p>Licenses: <a target="_blank" href="http://creativecommons.org/licenses/by/4.0/"><span class="text-indigo-500">CC-BY-4.0</span></a></p>
 			</div>
 		</div>
 		<button v-if="!inRoom" @click="enterRoom" class="absolute w-18 h-10 bottom-4 right-4 rounded-md bg-gray-700 text-gray-300">Enter</button>
@@ -85,7 +86,7 @@ export default {
 			{
 				this.renderer = new WebGLRenderer({antialias: true});
 				this.renderer.name = "Renderer";
-				this.renderer.setClearColor(0x888888);
+				// this.renderer.setClearColor(0x888888);
 				this.renderer.setPixelRatio(window.devicePixelRatio);
 				this.renderer.setSize(this.sceneSpace.clientWidth, this.sceneSpace.clientHeight);
 				this.renderer.outputEncoding = sRGBEncoding;
