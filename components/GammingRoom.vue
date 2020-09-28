@@ -2,7 +2,7 @@
 	<div id="sceneSpace" class="relative w-screen h-screen">
 		<div class="flex justify-center absolute w-screen text-gray-500">
 			<div class="text-center">
-				<h1>3D Model</h1>
+				<h1>3D Model. Takes around 30 seconds to load on netlify</h1>
 				<p>Author: <a target="_blank" href="https://sketchfab.com/vboichut"><span class="text-indigo-500">Vincent</span></a></p>
 				<p>Source: <a target="_blank" href="https://sketchfab.com/3d-models/gaming-room-47c7c39f767e40eb84d1b1d857af525b"><span class="text-indigo-500">Gaming Room</span></a></p>
 				<p>Licenses: <a target="_blank" href="http://creativecommons.org/licenses/by/4.0/"><span class="text-indigo-500">CC-BY-4.0</span></a></p>
