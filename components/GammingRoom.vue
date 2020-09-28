@@ -72,8 +72,6 @@ export default {
 				this.camera = new PerspectiveCamera(fov, aspect, near, far);
 				this.camera.name = "Camera";
 				this.camera.position.set(150,300,600);
-				// this.camera.rotation.y = -Math.PI;
-				// this.camera.rotateY(-Math.PI / 2);
 			}
 
 			// Scene
@@ -245,7 +243,7 @@ export default {
 				if (intersects.length) {
 					this.intersect = intersects[0];
 
-					if (this.intersect.object.name == 'SOL1polySurface627_lambert68_0'){ // Not a good approach becuase id may change based on order of object
+					if (this.intersect.object.name == 'SOL1polySurface627_lambert68_0'){
 						this.circleOverHelper.position.copy(this.intersect.point).add(this.intersect.face.normal);
 					}
 				}
