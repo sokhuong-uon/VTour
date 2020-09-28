@@ -17,7 +17,7 @@
 				</svg>
 			</div>
 			<div class="h-12 px-1 flex items-center justify-center flex-1">
-				<h1 class="text-gray-100 font-semibold text-4xl">Venturary</h1>
+				<h1 class="text-gray-100 font-semibold text-4xl">Yeah</h1>
 			</div>
 		</div>
 		<div class="ml-auto">
