@@ -75,8 +75,6 @@
 					</div>
 				</div>
 			</div>
-
-
 		</div>
 	</div>
 </div>
@@ -84,6 +82,3 @@
 
 <script>
 export default {}
-</script>
-
-<style>
