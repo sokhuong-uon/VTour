@@ -5,6 +5,7 @@
 				<h1>3D Model</h1>
 				<p>Author: <a target="_blank" href="https://sketchfab.com/apsnu"><span class="text-indigo-500">bocharova</span></a></p>
 				<p>Source: <a target="_blank" href="https://sketchfab.com/models/7ede00c0dfe14574bd8f06ee36020609"><span class="text-indigo-500">swamp location</span></a></p>
+				<p>Licenses: <a target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/"><span class="text-indigo-500">CC-BY-NC-4.0</span></a></p>
 			</div>
 		</div>
 	</div>

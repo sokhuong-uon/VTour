@@ -6,6 +6,7 @@
 					<h1>3D Model</h1>
 					<p>Author: <a target="_blank" href="https://sketchfab.com/y2dan"><span class="text-indigo-500">y2dan</span></a></p>
 					<p>Source: <a target="_blank" href="https://sketchfab.com/models/7ae0c1028c404669826cde0656829287"><span class="text-indigo-500">Avenue Tennis - Main Gym 2018</span></a></p>
+					<p>Licenses: <a target="_blank" href="http://creativecommons.org/licenses/by/4.0/"><span class="text-indigo-500">CC-BY-4.0</span></a></p>
 				</div>
 			</div>
 		</div>
