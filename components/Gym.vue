@@ -29,23 +29,23 @@ export default {
 	data() {
 		return {
 			sceneSpace: null,
-            renderer: null,
-            stats: null,
-            camera: null,
-            scene: null,
-            raycaster: null,
+			renderer: null,
+			stats: null,
+			camera: null,
+			scene: null,
+			raycaster: null,
 			targetObjects: null,
-            circleOverHelper: null,
-            outLine: null,
+			circleOverHelper: null,
+			outLine: null,
 
-            mouse: null,
-            mouseDown: null,
+			mouse: null,
+			mouseDown: null,
 		}
 	},
 	methods: {
 		init() {
 			// Container
-            this.sceneSpace = document.getElementById('sceneSpace');
+			this.sceneSpace = document.getElementById('sceneSpace');
 
 			// Camera
 			{
@@ -154,11 +154,11 @@ export default {
 				this.circleOverHelper.add(this.outLine);
 			}
 
-            // Raycaster
-            this.raycaster = new Raycaster();
+			// Raycaster
+			this.raycaster = new Raycaster();
 
 			// Mouse
-            this.mouse = new Vector2();
+			this.mouse = new Vector2();
 
 			this.renderer.setAnimationLoop(this.animate);
 
@@ -169,24 +169,24 @@ export default {
 				this.renderer.render(this.scene, this.camera);
 				this.stats.update();
 			}, 1000 / 60);	// 60 fps, 1000/30 for 30 fps
-        },
+		},
 
 		initControls() {
-            this.camera.rotation.order = "YXZ";
+			this.camera.rotation.order = "YXZ";
 
-            // Mouse down
-            this.sceneSpace.addEventListener("mousedown", (evt) => {
-                this.mouseDown = true;
-                this.sceneSpace.style.cursor = "grab";
-            }, false);
+			// Mouse down
+			this.sceneSpace.addEventListener("mousedown", (evt) => {
+				this.mouseDown = true;
+				this.sceneSpace.style.cursor = "grab";
+			}, false);
 
-            // Mouse up
-            this.sceneSpace.addEventListener("mouseup", (evt) => {
-                this.sceneSpace.style.cursor = "default";
-                this.mouseDown = false;
-            }, false);
+			// Mouse up
+			this.sceneSpace.addEventListener("mouseup", (evt) => {
+				this.sceneSpace.style.cursor = "default";
+				this.mouseDown = false;
+			}, false);
 
-            this.sceneSpace.addEventListener("mousemove", (evt) => {
+			this.sceneSpace.addEventListener("mousemove", (evt) => {
 				let movementX = evt.movementX || evt.mozMovementX || evt.webkitMovementX || 0;
 				let movementY = evt.movementY || evt.mozMovementY || evt.webkitMovementY || 0;
 
@@ -195,8 +195,8 @@ export default {
 					this.camera.rotation.y -= -movementX / 600;
 					this.camera.rotation.x -= -movementY / 600;
 				}
-            },false);
-        },
+			},false);
+		},
 
 		onMouseMove(event){
 			event.preventDefault();
@@ -247,18 +247,18 @@ export default {
 		},
 
 		onWindowResize() {
-            this.renderer.setSize(this.sceneSpace.clientWidth, this.sceneSpace.clientHeight);
-            this.camera.aspect = this.sceneSpace.clientWidth / this.sceneSpace.clientHeight;
-            this.camera.updateProjectionMatrix();
-        },
+			this.renderer.setSize(this.sceneSpace.clientWidth, this.sceneSpace.clientHeight);
+			this.camera.aspect = this.sceneSpace.clientWidth / this.sceneSpace.clientHeight;
+			this.camera.updateProjectionMatrix();
+		},
 	},
 
 	mounted() {
 		this.init();
 		this.initControls();
-    	this.sceneSpace.addEventListener("mousemove", this.onMouseMove, false);
-        this.sceneSpace.addEventListener("mousedown", this.onMouseDown, false);
-        window.addEventListener('resize', this.onWindowResize, false);
+		this.sceneSpace.addEventListener("mousemove", this.onMouseMove, false);
+		this.sceneSpace.addEventListener("mousedown", this.onMouseDown, false);
+		window.addEventListener('resize', this.onWindowResize, false);
 	},
 
 	created(){

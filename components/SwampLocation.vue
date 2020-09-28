@@ -37,7 +37,7 @@ export default {
 	methods: {
 		init() {
 			// Container
-            this.sceneSpace = document.getElementById('sceneSpace');
+			this.sceneSpace = document.getElementById('sceneSpace');
 			this.sceneSpace.name = "Scene Space";
 
 			// Camera
@@ -124,13 +124,13 @@ export default {
 				this.renderer.render(this.scene, this.camera);
 				this.stats.update();
 			}, 1000 / 60);	// 60 fps, 1000/30 for 30 fps
-        },
+		},
 
 		onWindowResize() {
-            this.renderer.setSize(this.sceneSpace.clientWidth, this.sceneSpace.clientHeight);
-            this.camera.aspect = this.sceneSpace.clientWidth / this.sceneSpace.clientHeight;
-            this.camera.updateProjectionMatrix();
-        },
+			this.renderer.setSize(this.sceneSpace.clientWidth, this.sceneSpace.clientHeight);
+			this.camera.aspect = this.sceneSpace.clientWidth / this.sceneSpace.clientHeight;
+			this.camera.updateProjectionMatrix();
+		},
 	},
 
 	mounted() {
