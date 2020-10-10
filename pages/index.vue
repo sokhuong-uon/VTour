@@ -75,6 +75,17 @@
 					</div>
 				</div>
 			</div>
+
+			<div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 mb-4 h-72">
+				<div class="w-full h-full p-2">
+					<div class="w-full h-full overflow-hidden shadow hover:shadow-xl">
+						<nuxt-link class="w-full h-full" to="/tours/test">
+							<!--<img class="w-full h-full object-cover transform transition-all duration-500 hover:scale-125" src="img/swamplocation.jpg" alt="">-->
+							<iframe src="/tours/test" class="w-full h-full"></iframe>
+						</nuxt-link>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>
