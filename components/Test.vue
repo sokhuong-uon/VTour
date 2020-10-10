@@ -137,12 +137,10 @@ export default {
 					new MeshBasicMaterial({map: loader.load('https://images.unsplash.com/photo-1581803118522-7b72a50f7e9f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=3&w=128&h=128&q=100'), side: BackSide}),
 					new MeshBasicMaterial({map: loader.load('https://images.unsplash.com/photo-1495366691023-cc4eadcc2d7e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=4&w=128&h=128&q=100'), side: BackSide}),
 				];
-				for(let i=-5; i<5; i++){
-					for(let j=-5; j<5; j++){
+				for(let i=-5.5; i<5; i++){
+					for(let j=-5.5; j<5; j++){
 						let cube = new Mesh(geometry, materials);
-						cube.position.set(i+0.5, 0.5, j+0.5);
-						// cube.material.wireframe  = true;
-						// cube.material.side  = BackSide;
+						cube.position.set(i, 0.5, j);
 						this.scene.add(cube);
 					}
 				}
