@@ -107,14 +107,14 @@ export default {
 
 			// Circle Helper
 			{
-				let geometry = new CircleBufferGeometry(8, 24);
+				let geometry = new CylinderBufferGeometry(8, 8, 0.02, 60);
 				let material = new MeshBasicMaterial({color: 0x353535});
 				this.circleOverHelper = new Mesh(geometry, material);
+				this.circleOverHelper.rotateX(-Math.PI / 2);
 				const outline = new Mesh(
-					new CylinderBufferGeometry(6, 6, 0.3, 24),
+					new CylinderBufferGeometry(6, 6, 0.05, 60),
 					new MeshBasicMaterial({color: 0xfffffa, side: DoubleSide})
 				);
-				outline.rotateX(-Math.PI/2);
 				this.circleOverHelper.add(outline);
 				this.circleOverHelper.rotateX(-Math.PI/2);
 				this.scene.add(this.circleOverHelper);
