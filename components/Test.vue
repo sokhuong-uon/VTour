@@ -1,8 +1,17 @@
 <template>
 	<div id="sceneSpace" class="w-screen h-screen">
-		<div class="absolute right-4 top-4 text-gray-200">
-			<button @click="juphBetweenCube(0)" class="w-10 h-8 bg-gray-700">0</button>
-			<button @click="juphBetweenCube(1)" class="w-10 h-8 bg-gray-700">1</button>
+		<div class="absolute right-4 top-4 w-32 h-32 text-gray-200 flex flex-wrap justify-even">
+			<button @click="juphBetweenCube(-1,-1)" class="w-1/3 h-8 bg-gray-700">-1,-1</button>
+			<button @click="juphBetweenCube(0,-1)" class="w-1/3 h-8 bg-gray-700">0,-1</button>
+			<button @click="juphBetweenCube(1,-1)" class="w-1/3 h-8 bg-gray-700">1,-1</button>
+
+			<button @click="juphBetweenCube(-1,0)" class="w-1/3 h-8 bg-gray-700">-1,0</button>
+			<button @click="juphBetweenCube(0,0)" class="w-1/3 h-8 bg-gray-700">0,0</button>
+			<button @click="juphBetweenCube(1,0)" class="w-1/3 h-8 bg-gray-700">1,0</button>
+
+			<button @click="juphBetweenCube(-1,1)" class="w-1/3 h-8 bg-gray-700">-1,1</button>
+			<button @click="juphBetweenCube(0,1)" class="w-1/3 h-8 bg-gray-700">0,1</button>
+			<button @click="juphBetweenCube(1,1)" class="w-1/3 h-8 bg-gray-700">1,1</button>
 		</div>
 	</div>
 </template>
@@ -72,13 +81,13 @@ export default {
 
 			// Camera
 			{
-				const fov = 75;
+				const fov = 70;
 				const aspect = this.sceneSpace.clientWidth / this.sceneSpace.clientHeight;
 				const near = 0.1;
 				const far = 1000;
 				this.camera = new PerspectiveCamera(fov, aspect, near, far);
 				this.camera.name = "Camera";
-				this.camera.position.set(0, 4, 4);
+				this.camera.position.set(0, 4, 6);
 				// this.camera.rotation.y = -Math.PI;
 			}
 
@@ -124,22 +133,6 @@ export default {
 				this.scene.add( gridHelper );
 			}
 
-			// Circle Helper
-			// {
-			// 	let geometry = new CylinderBufferGeometry(0.3, 0.3, 0.01, 60);
-			// 	let material = new MeshBasicMaterial({color: 0x353535});
-			// 	this.circleOverHelper = new Mesh(geometry, material);
-			// 	this.circleOverHelper.rotateX(-Math.PI / 2);
-			// 	const outline = new Mesh(
-			// 		new CylinderBufferGeometry(0.2, 0.2, 0.02, 60),
-			// 		new MeshBasicMaterial({color: 0xfffffa, side: DoubleSide})
-			// 	);
-			// 	// outline.rotateX(-Math.PI/2);
-			// 	this.circleOverHelper.add(outline);
-			// 	this.circleOverHelper.rotateX(-Math.PI/2);
-			// 	this.scene.add(this.circleOverHelper);
-			// }
-
 			// Plane
 			{
 				const geometry = new PlaneBufferGeometry(10, 10);
@@ -153,21 +146,9 @@ export default {
 
 			// Cube
 			{
-				const geometry = new BoxBufferGeometry(2, 2, 2);
-				// const geometry = new SphereBufferGeometry(2, 64, 64);
-				// const material = new MeshLambertMaterial({color: 0x353535, side: BackSide});
-				// const loader = new TextureLoader();
-				// const materials = [
-				// 	new MeshBasicMaterial({map: loader.load('/cubemaps/group1/px.png'), side: BackSide}),
-				// 	new MeshBasicMaterial({map: loader.load('/cubemaps/group1/nx.png'), side: BackSide}),
-				// 	new MeshBasicMaterial({map: loader.load('/cubemaps/group1/py.png'), side: BackSide}),
-				// 	new MeshBasicMaterial({map: loader.load('/cubemaps/group1/ny.png'), side: BackSide}),
-				// 	new MeshBasicMaterial({map: loader.load('/cubemaps/group1/pz.png'), side: BackSide}),
-				// 	new MeshBasicMaterial({map: loader.load('/cubemaps/group1/nz.png'), side: BackSide}),
-				// ];
+				const geometry = new BoxBufferGeometry(1, 1, 1);
 				const loader = new CubeTextureLoader();
 				loader.setPath( '/cubemaps/group1/' );
-
 				let textureCube = loader.load( [
 					'px.png',
 					'nx.png',
@@ -178,19 +159,19 @@ export default {
 				] );
 
 				let material = new MeshBasicMaterial( { color: 0xffffff, envMap: textureCube, side: BackSide} );
-				// for(let i=-4; i<=4; i+=2){
-				// 	for(let j=-4; j<=4; j+=2){
-				// 		let cube = new Mesh(geometry, materials);
-				// 		cube.position.set(i, 1, j);
-				// 		this.scene.add(cube);
-				// 		this.targetObjects.push(cube);
-				// 	}
-				// }
-				let cube = new Mesh(geometry, material);
-				cube.position.set(0, 1, 0);
-				this.scene.add(cube);
-				this.targetObjects.push(cube);
-				this.renderer.background = material;
+				for(let i=-1; i<=1; i++){
+					for(let j=-1; j<=1; j++){
+						let cube = new Mesh(geometry, material);
+						cube.position.set(i, 0.5, j);
+						this.scene.add(cube);
+						this.targetObjects.push(cube);
+					}
+				}
+				// let cube = new Mesh(geometry, material);
+				// cube.position.set(0, 1, 0);
+				// this.scene.add(cube);
+				// this.targetObjects.push(cube);
+				// this.renderer.background = material;
 
 			}
 
@@ -240,11 +221,11 @@ export default {
 			},false);
 		},
 
-		juphBetweenCube(cubeID){
+		juphBetweenCube(x,z){
 			gsap.to(this.camera.position,{
-				x: 0,
-				y: 1,
-				z: cubeID,
+				x: x,
+				y: 0.5,
+				z: z,
 				ease: "Power3.InOut",
 				duration: 2,
 			})
