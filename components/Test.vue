@@ -69,7 +69,7 @@ export default {
 				const far = 1000;
 				this.camera = new PerspectiveCamera(fov, aspect, near, far);
 				this.camera.name = "Camera";
-				this.camera.position.set(0.5, 1, 0.5);
+				this.camera.position.set(0.5, 2, 0.5);
 				// this.camera.rotation.y = -Math.PI;
 			}
 
