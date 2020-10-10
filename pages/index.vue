@@ -61,7 +61,7 @@
 				<div class="w-full h-full p-2">
 					<div class="relative w-full h-full overflow-hidden shadow hover:shadow-xl">
 						<iframe src="/tours/test" class="w-full h-full"></iframe>
-						<nuxt-link class="absolute right-0 top-0 w-12 h-8 rounded-bl-md bg-gray-800 text-gray-200 flex justify-center items-center hover:shadow-lg hover:bg-gray-700" to="/tours/test">
+						<nuxt-link class="absolute right-0 top-0 w-12 h-8 rounded-bl-md bg-gray-800 text-gray-200 flex justify-center items-center hover:bg-gray-700" to="/tours/test">
 							<p class="">Visit</p>
 						</nuxt-link>
 					</div>
