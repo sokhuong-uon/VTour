@@ -73,4 +73,35 @@
 </template>
 
 <script>
-export default {}
+
+import _ from 'lodash';
+
+export default {
+	name: 'Home',
+	methods: {
+		Log(){
+			const link = 'https://github.com/SOKHUONG/VTour';
+			console.log( [
+				'   ___  ___   _____   __   __',
+				'  / __\\/\\__\\/ _____\\ / __\\/\\__\\',
+				' / /  / /  / /  ___// /  / ___/',
+				'/ /  /_/  /  \\__  \\/ /  /  \\',
+				'\\/_______/\\/______/\\/__/\\___\\',
+			].join( '\n' ) );
+        	console.log("%c💝 I am really appreciate that you interested in my code 😊", "background: transparent; color: #ed0e90; font-size: 30px; font-weight: 600; font-family: Lobster, serif; height: 200px");
+			console.log(`%c Source code of this project on github: %c${link}`,"font-family: Lobster, serif;color: #0eed98; font-size: 25px","font-size: 15px;");
+		}
+	},
+    mounted() {
+		if(!sessionStorage.getItem('logged')){
+			// _.once(this.Log) will return a funtion, so just call it directly.
+			_.once(this.Log)();
+			sessionStorage.setItem('logged', true);
+		}
+
+		window.onunload = function () {
+			sessionStorage.removeItem('logged');
+    	}
+    }
+}
+</script>
