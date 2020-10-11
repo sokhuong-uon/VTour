@@ -2,8 +2,6 @@
 
 [![Game Room](https://raw.githubusercontent.com/SOKHUONG/VTour/master/static/img/gameroom.jpg)](https://usk-virtual-tour.netlify.app/)
 
-<iframe src="https://usk-virtual-tour.netlify.app/tours/gameroom" style="width:1200px; height:700px;"></iframe>
-
 [![Netlify Status](https://api.netlify.com/api/v1/badges/299761b8-d51d-4646-84be-ae62bfe0b636/deploy-status)](https://app.netlify.com/sites/usk-virtual-tour/deploys)
 
 ## Build Setup
