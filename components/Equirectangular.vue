@@ -3,6 +3,14 @@
 	<div class="absolute w-full h-10 flex items-center justify-center text-green-700 text-lg select-none">
 		Drag and drop (360x180)degree panorama image
 	</div>
+	<div class="absolute right-0 bottom-0 w-20 h-20 flex flex-wrap bg-gray-700 items-center justify-center overflow-y-auto">
+		<button @click="changePanorama(0)" class="w-6 h-6 mx-1 bg-indigo-600 text-gray-100 text-lg">1</button>
+		<button @click="changePanorama(1)" class="w-6 h-6 mx-1 bg-indigo-600 text-gray-100 text-lg">2</button>
+		<!--
+		<button @click="changePanorama(2)" class="w-6 h-6 mx-1 bg-indigo-600 text-gray-100 text-lg">3</button>
+		<button @click="changePanorama(3)" class="w-6 h-6 mx-1 bg-indigo-600 text-gray-100 text-lg">4</button>
+		-->
+	</div>
 </div>
 </template>
 
@@ -14,7 +22,7 @@ import {
 	MeshBasicMaterial, TextureLoader,
 	AxesHelper, GridHelper,
 	sRGBEncoding, PCFSoftShadowMap,
-	Raycaster, Vector2, MathUtils, Vector3
+	Raycaster, Vector2, MathUtils, Vector3, BackSide, DoubleSide
 } from 'three';
 import gsap from 'gsap';
 import Stats from '~/node_modules/three/examples/jsm/libs/stats.module.js';
@@ -30,6 +38,12 @@ export default {
 			stats: null,
 
 			sphereMaterial: null,
+			panoramaImageSrc: [
+				'/panoramas/ballroom.jpg',
+				'/panoramas/fireplace.jpg',
+				'/panoramas/st_fagans_interior.jpg',
+				'https://upload.wikimedia.org/wikipedia/commons/e/e4/Siilinj%C3%A4rven_kirkko_360x180_astetta.jpg'
+			],
 
 			isUserInteracting: false,
 			onPointerDownMouseX: 0,
@@ -84,7 +98,7 @@ export default {
 				this.camera = new PerspectiveCamera(fov, aspect, near, far);
 				this.camera.name = "Camera";
 				this.camera.target = new Vector3(0, 0, 0);
-				this.camera.position.set(0,0,0);
+				this.camera.position.set(0,20,0);
 			}
 
 			// Light
@@ -98,30 +112,44 @@ export default {
 
 			// Helper
 			{
-				let helper = new AxesHelper(100);
+				let helper = new AxesHelper(50);
 				this.scene.add(helper);
 			}
 
 			// Grid Helper
-			// {
-			// 	let gridHelper = new GridHelper(500, 500, 0xffffff);
-			// 	gridHelper.position.set(0, -5, 0)
-			// 	this.scene.add(gridHelper);
-			// }
-
 			{
-				let geometry = new SphereBufferGeometry(100, 60, 60);
+				let gridHelper = new GridHelper(500, 500, 0xffffff);
+				gridHelper.position.set(0, 0, 0)
+				this.scene.add(gridHelper);
+			}
+
+			// Sphere
+			{
+				let geometry = new SphereBufferGeometry(10, 60, 60);
 				// invert the geometry on the x-axis so that all of the faces point inward
 				geometry.scale(-1, 1, 1);
 
 				let texture = new TextureLoader().load(
-					"https://upload.wikimedia.org/wikipedia/commons/e/e4/Siilinj%C3%A4rven_kirkko_360x180_astetta.jpg"
+					"/panoramas/ballroom.jpg"
 				);
 				this.sphereMaterial = new MeshBasicMaterial({ map: texture });
 
 				let mesh = new Mesh(geometry, this.sphereMaterial);
 
 				this.scene.add(mesh);
+
+				texture = new TextureLoader().load(
+					"/panoramas/fireplace.jpg"
+				);
+				let sphere = new Mesh(geometry, new MeshBasicMaterial({ map: texture }));
+				sphere.position.set(15, 0, 0);
+				this.scene.add(sphere);
+
+				geometry = new SphereBufferGeometry(1,10,10);
+				let material = new MeshBasicMaterial({color: 0x435999});
+				let smallSphere = new Mesh(geometry, material)
+				smallSphere.position.set(5, 0, 0);
+				sphere.add(smallSphere);
 			}
 
 			this.sceneSpace.style.touchAction = "none";
@@ -218,6 +246,22 @@ export default {
 			this.camera.fov = MathUtils.clamp(fov, 10, 75);
 
 			this.camera.updateProjectionMatrix();
+		},
+
+		changePanorama(index){
+			gsap.to(this.camera.position,{
+				x: index*15,
+				// y: 10* index,
+				// z: 10* index + 15,
+				ease: "power3",
+				duration: 1
+			});
+
+			// console.log(this.sphereMaterial.map.image);
+			// console.log(this.sphereMaterial.map.image.src);
+			// this.sphereMaterial.map.image.src = this.panoramaImageSrc[index];
+			// this.sphereMaterial.map.image.opacity = 0.1;
+			// this.sphereMaterial.map.needsUpdate = true;
 		},
 
 		animate() {
