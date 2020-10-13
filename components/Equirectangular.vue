@@ -3,7 +3,7 @@
 	<div class="absolute w-full h-10 flex items-center justify-center text-green-700 text-lg select-none">
 		Drag and drop (360x180)degree panorama image
 	</div>
-	<div class="absolute right-0 bottom-0 w-20 h-20 flex flex-wrap bg-gray-700 items-center justify-center overflow-y-auto">
+	<div class="absolute right-0 bottom-4 w-20 h-10 flex flex-wrap bg-gray-700 items-center justify-center overflow-y-auto">
 		<button @click="changePanorama(0)" class="w-6 h-6 mx-1 bg-indigo-600 text-gray-100 text-lg">1</button>
 		<button @click="changePanorama(1)" class="w-6 h-6 mx-1 bg-indigo-600 text-gray-100 text-lg">2</button>
 		<!--
