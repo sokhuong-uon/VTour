@@ -164,7 +164,7 @@ export default {
 						let cube = new Mesh(geometry, material);
 						cube.position.set(i, 0.5, j);
 						this.scene.add(cube);
-						this.targetObjects.push(cube);
+						// this.targetObjects.push(cube);
 					}
 				}
 				// let cube = new Mesh(geometry, material);

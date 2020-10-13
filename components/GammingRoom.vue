@@ -62,23 +62,6 @@ export default {
 			this.sceneSpace = document.getElementById('sceneSpace');
 			this.sceneSpace.name = "Scene Space";
 
-			// Camera
-			{
-				const fov = 75;
-				const aspect = this.sceneSpace.clientWidth / this.sceneSpace.clientHeight;
-				const near = 0.1;
-				const far = 5000;
-				this.camera = new PerspectiveCamera(fov, aspect, near, far);
-				this.camera.name = "Camera";
-				this.camera.position.set(150,300,600);
-			}
-
-			// Scene
-			{
-				this.scene = new Scene();
-				this.scene.name  = "Scene";
-			}
-
 			// WebGL Renderer
 			{
 				this.renderer = new WebGLRenderer({antialias: true});
@@ -97,6 +80,32 @@ export default {
 				this.stats = new Stats();
 				this.stats.name = "Stats Bar"
 				this.sceneSpace.appendChild(this.stats.domElement);
+			}
+
+			// Scene
+			{
+				this.scene = new Scene();
+				this.scene.name  = "Scene";
+			}
+
+			// Camera
+			{
+				const fov = 75;
+				const aspect = this.sceneSpace.clientWidth / this.sceneSpace.clientHeight;
+				const near = 0.1;
+				const far = 5000;
+				this.camera = new PerspectiveCamera(fov, aspect, near, far);
+				this.camera.name = "Camera";
+				this.camera.position.set(150,300,600);
+			}
+
+			// Light
+			{
+				const color = 0xffffff;
+				const intensity = 1;
+				const ambientLight = new AmbientLight(color, intensity);
+				ambientLight.name = "Ambient Light";
+				this.scene.add(ambientLight);
 			}
 
 			// Helper
@@ -120,14 +129,6 @@ export default {
 				this.scene.add(this.circleOverHelper);
 			}
 
-			// Light
-			{
-				const color = 0xffffff;
-				const intensity = 1;
-				const ambientLight = new AmbientLight(color, intensity);
-				ambientLight.name = "Ambient Light";
-				this.scene.add(ambientLight);
-			}
 
 			// Load GLTF
 			{
