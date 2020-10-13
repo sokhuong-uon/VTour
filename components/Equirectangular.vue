@@ -117,11 +117,11 @@ export default {
 			}
 
 			// Grid Helper
-			{
-				let gridHelper = new GridHelper(500, 500, 0xffffff);
-				gridHelper.position.set(0, 0, 0)
-				this.scene.add(gridHelper);
-			}
+			// {
+			// 	let gridHelper = new GridHelper(500, 500, 0xffffff);
+			// 	gridHelper.position.set(0, 0, 0)
+			// 	this.scene.add(gridHelper);
+			// }
 
 			// Sphere
 			{
