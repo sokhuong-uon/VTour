@@ -98,7 +98,7 @@ export default {
 				this.camera = new PerspectiveCamera(fov, aspect, near, far);
 				this.camera.name = "Camera";
 				this.camera.target = new Vector3(0, 0, 0);
-				this.camera.position.set(0,20,0);
+				this.camera.position.set(0,0,0);
 			}
 
 			// Light
@@ -145,11 +145,11 @@ export default {
 				sphere.position.set(15, 0, 0);
 				this.scene.add(sphere);
 
-				geometry = new SphereBufferGeometry(1,10,10);
-				let material = new MeshBasicMaterial({color: 0x435999});
-				let smallSphere = new Mesh(geometry, material)
-				smallSphere.position.set(5, 0, 0);
-				sphere.add(smallSphere);
+				// geometry = new SphereBufferGeometry(1,10,10);
+				// let material = new MeshBasicMaterial({color: 0x435999});
+				// let smallSphere = new Mesh(geometry, material)
+				// smallSphere.position.set(5, 0, 0);
+				// sphere.add(smallSphere);
 			}
 
 			this.sceneSpace.style.touchAction = "none";
