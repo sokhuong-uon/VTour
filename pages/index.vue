@@ -37,9 +37,9 @@
 	<!--main section-->
 	<div class="h-full w-full p-2 overflow-y-auto">
 		<div class="flex flex-wrap -mb-4">
-			<div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 mb-4 h-72">
+			<div class="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 mb-4 h-90">
 				<div class="w-full h-full p-2">
-					<div class="w-full h-full overflow-hidden shadow hover:shadow-xl">
+					<div class="w-full h-full rounded overflow-hidden shadow hover:shadow-xl">
 						<nuxt-link class="w-full h-full" to="/tours/gameroom">
 							<img class="w-full h-full object-cover transform transition-all duration-500 hover:scale-125" src="img/gameroom.jpg" alt="">
 						</nuxt-link>
@@ -47,9 +47,9 @@
 				</div>
 			</div>
 
-			<div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 mb-4 h-72">
+			<div class="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 mb-4 h-90">
 				<div class="w-full h-full p-2">
-					<div class="w-full h-full overflow-hidden shadow hover:shadow-xl">
+					<div class="w-full h-full rounded overflow-hidden shadow hover:shadow-xl">
 						<nuxt-link class="w-full h-full" to="/tours/swamplocation">
 							<img class="w-full h-full object-cover transform transition-all duration-500 hover:scale-125" src="img/swamplocation.jpg" alt="">
 						</nuxt-link>
@@ -57,7 +57,7 @@
 				</div>
 			</div>
 
-			<div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 mb-4 h-72">
+			<div class="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 mb-4 h-90">
 				<div class="w-full h-full p-2">
 					<div class="relative w-full h-full overflow-hidden shadow hover:shadow-xl">
 						<iframe id="test" src="/tours/test" class="w-full h-full" allow="fullscreen"></iframe>
@@ -68,7 +68,7 @@
 				</div>
 			</div>
 
-			<div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 mb-4 h-72">
+			<div class="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 mb-4 h-90">
 				<div class="w-full h-full p-2">
 					<div class="relative w-full h-full overflow-hidden shadow hover:shadow-xl">
 						<iframe id="360_180" src="/tours/360_180" class="w-full h-full"></iframe>
