@@ -60,10 +60,10 @@
 			<div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 mb-4 h-72">
 				<div class="w-full h-full p-2">
 					<div class="relative w-full h-full overflow-hidden shadow hover:shadow-xl">
-						<iframe src="/tours/test" class="w-full h-full"></iframe>
-						<nuxt-link class="absolute right-0 top-0 w-12 h-8 rounded-bl-md bg-gray-800 text-gray-200 flex justify-center items-center hover:bg-gray-700" to="/tours/test">
-							<p class="">Visit</p>
-						</nuxt-link>
+						<iframe id="test" src="/tours/test" class="w-full h-full" allow="fullscreen"></iframe>
+						<button @click="openFullscreen('test')" class="absolute right-0 top-0 w-8 h-8 bg-green-800 text-gray-100">
+							<FullScreenButton/>
+						</button>
 					</div>
 				</div>
 			</div>
@@ -71,10 +71,10 @@
 			<div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 mb-4 h-72">
 				<div class="w-full h-full p-2">
 					<div class="relative w-full h-full overflow-hidden shadow hover:shadow-xl">
-						<iframe src="/tours/360_180" class="w-full h-full"></iframe>
-						<nuxt-link class="absolute right-0 top-0 w-12 h-8 rounded-bl-md bg-gray-800 text-gray-200 flex justify-center items-center hover:bg-gray-700" to="/tours/360_180">
-							<p class="">Visit</p>
-						</nuxt-link>
+						<iframe id="360_180" src="/tours/360_180" class="w-full h-full"></iframe>
+						<button @click="openFullscreen('360_180')" class="absolute right-0 top-0 w-8 h-8 bg-green-800 text-gray-100">
+							<FullScreenButton/>
+						</button>
 					</div>
 				</div>
 			</div>
@@ -101,6 +101,27 @@ export default {
 			].join( '\n' ) );
         	console.log("%c💝 I am really appreciate that you interested in my code 😊", "background: transparent; color: #ed0e90; font-size: 30px; font-weight: 600; font-family: Lobster, serif; height: 200px");
 			console.log(`%c Source code of this project on github: %c${link}`,"font-family: Lobster, serif;color: #0eed98; font-size: 25px","font-size: 15px;");
+		},
+
+		openFullscreen(id) {
+			let iframe = document.getElementById(id);
+			if (iframe.requestFullscreen) {
+
+				iframe.requestFullscreen();
+
+			} else if (iframe.mozRequestFullScreen) { /* Firefox */
+
+				iframe.mozRequestFullScreen();
+
+			} else if (iframe.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+
+				iframe.webkitRequestFullscreen();
+
+			} else if (iframe.msRequestFullscreen) { /* IE/Edge */
+
+				iframe.msRequestFullscreen();
+
+			}
 		}
 	},
     mounted() {
