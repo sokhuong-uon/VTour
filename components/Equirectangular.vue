@@ -38,7 +38,7 @@ export default {
 			stats: null,
 
 			sphereMaterial: null,
-			panoramaImageSrc: [
+			panoramaImageSources: [
 				'/panoramas/ballroom.jpg',
 				'/panoramas/fireplace.jpg',
 				'/panoramas/st_fagans_interior.jpg',
@@ -257,11 +257,6 @@ export default {
 				duration: 1
 			});
 
-			// console.log(this.sphereMaterial.map.image);
-			// console.log(this.sphereMaterial.map.image.src);
-			// this.sphereMaterial.map.image.src = this.panoramaImageSrc[index];
-			// this.sphereMaterial.map.image.opacity = 0.1;
-			// this.sphereMaterial.map.needsUpdate = true;
 		},
 
 		animate() {
