@@ -49,32 +49,19 @@
 
 			<div class="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 mb-4 h-90">
 				<div class="w-full h-full p-2">
-					<div class="w-full h-full rounded overflow-hidden shadow hover:shadow-xl">
-						<nuxt-link class="w-full h-full" to="/tours/swamplocation">
-							<img class="w-full h-full object-cover transform transition-all duration-500 hover:scale-125" src="img/swamplocation.jpg" alt="">
-						</nuxt-link>
-					</div>
-				</div>
-			</div>
-
-			<div class="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 mb-4 h-90">
-				<div class="w-full h-full p-2">
-					<div class="relative w-full h-full overflow-hidden shadow hover:shadow-xl">
-						<iframe id="test" src="/tours/test" class="w-full h-full" allow="fullscreen"></iframe>
-						<button @click="openFullscreen('test')" class="absolute right-0 top-0 w-8 h-8 bg-green-800 text-gray-100">
-							<FullScreenButton/>
-						</button>
-					</div>
-				</div>
-			</div>
-
-			<div class="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 mb-4 h-90">
-				<div class="w-full h-full p-2">
 					<div class="relative w-full h-full overflow-hidden shadow hover:shadow-xl">
 						<iframe id="360_180" src="/tours/360_180" class="w-full h-full"></iframe>
 						<button @click="openFullscreen('360_180')" class="absolute right-0 top-0 w-8 h-8 bg-green-800 text-gray-100">
-							<FullScreenButton/>
+							full
 						</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 mb-4 h-90">
+				<div class="w-full h-full p-2">
+					<div class="relative w-full h-full overflow-hidden shadow hover:shadow-xl">
+						<iframe class="w-full h-full" style="width: 100%; height: 100%;" src="https://nokor.netlify.app/tours/a/" frameborder="0" allowfullscreen allow="vr; xr-spatial-tracking"></iframe>
 					</div>
 				</div>
 			</div>
@@ -88,10 +75,15 @@
 import _ from 'lodash';
 
 export default {
+
 	name: 'Home',
+
 	methods: {
+
 		Log(){
+
 			const link = 'https://github.com/SOKHUONG/VTour';
+
 			console.log( [
 				'   ___  ___   _____   __   __',
 				'  / __\\/\\__\\/ _____\\ / __\\/\\__\\',
@@ -99,12 +91,15 @@ export default {
 				'/ /  /_/  /  \\__  \\/ /  /  \\',
 				'\\/_______/\\/______/\\/__/\\___\\',
 			].join( '\n' ) );
-        	console.log("%c💝 I am really appreciate that you interested in my code 😊", "background: transparent; color: #ed0e90; font-size: 30px; font-weight: 600; font-family: Lobster, serif; height: 200px");
+			console.log("%c💝 I am really appreciate that you interested in my code 😊", "background: transparent; color: #ed0e90; font-size: 30px; font-weight: 600; font-family: Lobster, serif; height: 200px");
 			console.log(`%c Source code of this project on github: %c${link}`,"font-family: Lobster, serif;color: #0eed98; font-size: 25px","font-size: 15px;");
+
 		},
 
 		openFullscreen(id) {
+
 			let iframe = document.getElementById(id);
+
 			if (iframe.requestFullscreen) {
 
 				iframe.requestFullscreen();
@@ -122,18 +117,29 @@ export default {
 				iframe.msRequestFullscreen();
 
 			}
+
 		}
+
 	},
+
     mounted() {
+
 		if(!sessionStorage.getItem('logged')){
+
 			// _.once(this.Log) will return a funtion, so just call it directly.
 			_.once(this.Log)();
 			sessionStorage.setItem('logged', true);
+
 		}
 
 		window.onunload = function () {
+
 			sessionStorage.removeItem('logged');
+
     	}
+
     }
+
 }
+
 </script>
